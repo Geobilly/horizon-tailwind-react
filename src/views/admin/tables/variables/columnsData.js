@@ -34,6 +34,14 @@ export const columnsDataCheck = [
     Header: "DATE",
     accessor: "date",
   },
+  {
+    Header: "STATUS", // New Column
+    accessor: "status", // This must match the key in the tableData
+  },
+  {
+    Header: "ACTIONS", // New Column
+    accessor: "actions", // This must match the key in the tableData
+  },
 ];
 
 export const columnsDataColumns = [
@@ -52,6 +60,12 @@ export const columnsDataColumns = [
   {
     Header: "DATE",
     accessor: "date",
+
+  },
+
+  {
+    Header: "ACTIONS", // New Column
+    accessor: "actions", // This must match the key in the tableData
   },
 ];
 

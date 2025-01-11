@@ -1,5 +1,4 @@
 import CheckTable from "./components/CheckTable";
-
 import {
   columnsDataDevelopment,
   columnsDataCheck,
@@ -16,25 +15,10 @@ import ComplexTable from "./components/ComplexTable";
 
 const Tables = () => {
   return (
-    <div>
-      <div className="mt-5 grid h-full grid-cols-1 gap-5 md:grid-cols-2">
-        <DevelopmentTable
-          columnsData={columnsDataDevelopment}
-          tableData={tableDataDevelopment}
-        />
+    <div className="h-screen flex justify-center items-center"> {/* Centering the content in the viewport */}
+      <div className="mt-5 w-full max-w-screen-lg">
+        {/* Main container for the CheckTable */}
         <CheckTable columnsData={columnsDataCheck} tableData={tableDataCheck} />
-      </div>
-
-      <div className="mt-5 grid h-full grid-cols-1 gap-5 md:grid-cols-2">
-        <ColumnsTable
-          columnsData={columnsDataColumns}
-          tableData={tableDataColumns}
-        />
-
-        <ComplexTable
-          columnsData={columnsDataComplex}
-          tableData={tableDataComplex}
-        />
       </div>
     </div>
   );

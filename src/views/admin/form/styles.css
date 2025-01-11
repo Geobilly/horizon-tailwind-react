@@ -1,0 +1,98 @@
+/* Adjusted CSS for Positioning */
+
+/* Name and Position Section */
+.your-name-position {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start; /* Align text to the start of the container */
+  gap: 4px; /* Add spacing between name and position */
+  margin-bottom: 8px; /* Add spacing between this section and the next */
+}
+
+/* Contact Information Section */
+.contract {
+  display: flex;
+  flex-direction: column;
+  gap: 6px; /* Add spacing between phone, email, and location sections */
+  margin-bottom: 8px; /* Add spacing below contact details */
+}
+
+.phone, .email-2, .location {
+  display: flex;
+  align-items: center; /* Align icons and text vertically */
+  gap: 6px; /* Add spacing between icon and text */
+}
+
+/* Icon Adjustments */
+.akar-icons-phone,
+.line-md-email,
+.system-uicons-location {
+  width: 10px;
+  height: 10px;
+}
+
+/* Text Styling */
+.number, .email, .address {
+  color: rgba(0, 0, 0, 1);
+  font-size: 8px;
+  line-height: 12px; /* Increase line height for better readability */
+  font-family: Inter, sans-serif;
+  font-weight: 300;
+}
+
+/* Adjust QR Code */
+.qr-code {
+  position: absolute;
+  top: 120px; /* Adjust vertical position */
+  left: 260px; /* Adjust horizontal position */
+  width: 42px;
+  height: 42px;
+}
+
+/* Adjust Company Logo */
+.company-name-logo {
+  position: absolute;
+  top: 20px; /* Slightly higher */
+  left: 230px; /* Centered with QR code */
+  width: 90.65px;
+  height: 43px;
+}
+
+/* Adjust Decorative Shape */
+.shape {
+  position: absolute;
+  top: 0;
+  left: 175px;
+  width: 163px;
+  height: 100%;
+}
+
+/* Reduce Spacing Between Vectors */
+.vector-8 {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 28.65px;
+  height: 100%;
+}
+.vector-9 {
+  position: absolute;
+  top: 0;
+  left: 3px; /* Closer to the previous element */
+  width: 31px;
+  height: 100%;
+}
+.vector-10 {
+  position: absolute;
+  top: 0;
+  left: 6px; /* Closer to the previous element */
+  width: 31px;
+  height: 100%;
+}
+.vector-12 {
+  position: absolute;
+  top: 0;
+  left: 10px; /* Closer to the previous element */
+  width: 151px;
+  height: 100%;
+}

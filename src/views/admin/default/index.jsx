@@ -7,6 +7,8 @@ import { IoDocuments } from "react-icons/io5";
 import { MdBarChart, MdDashboard } from "react-icons/md";
 
 import { columnsDataCheck, columnsDataComplex } from "./variables/columnsData";
+import AddStudent from "../form/AddStudent";
+
 
 import Widget from "components/widget/Widget";
 import CheckTable from "views/admin/default/components/CheckTable";
@@ -65,35 +67,48 @@ const Dashboard = () => {
 
       <div className="mt-5 grid grid-cols-1 gap-5 xl:grid-cols-2">
         {/* Check Table */}
-        <div>
+        {/* <div>
           <CheckTable
             columnsData={columnsDataCheck}
             tableData={tableDataCheck}
           />
-        </div>
+        </div> */}
 
         {/* Traffic chart & Pie Chart */}
 
-        <div className="grid grid-cols-1 gap-5 rounded-[20px] md:grid-cols-2">
+        {/* <div className="grid grid-cols-1 gap-5 rounded-[20px] md:grid-cols-2">
           <DailyTraffic />
           <PieChartCard />
-        </div>
+        </div> */}
 
         {/* Complex Table , Task & Calendar */}
 
-        <ComplexTable
+        {/* <ComplexTable
           columnsData={columnsDataComplex}
           tableData={tableDataComplex}
-        />
+        /> */}
 
         {/* Task chart & Calendar */}
 
-        <div className="grid grid-cols-1 gap-5 rounded-[20px] md:grid-cols-2">
+        {/* <div className="grid grid-cols-1 gap-5 rounded-[20px] md:grid-cols-2">
           <TaskCard />
           <div className="grid grid-cols-1 rounded-[20px]">
             <MiniCalendar />
           </div>
-        </div>
+        </div> */}
+        {/* AddStudent Form */}
+      {/* <div className="mt-5">
+        <AddStudent
+          label="Student Name"
+          id="student-name"
+          type="text"
+          placeholder="Enter student name"
+          variant="auth"
+          state="success"
+          extra="p-4"
+          disabled={false}
+        />
+      </div> */}
       </div>
     </div>
   );

@@ -1,23 +1,34 @@
 import React from "react";
+import { Navigate } from "react-router-dom";
+import { FaFutbol } from "react-icons/fa";
 
-// Admin Imports
+
+// Import views
 import MainDashboard from "views/admin/default";
-import NFTMarketplace from "views/admin/marketplace";
 import Profile from "views/admin/profile";
-import DataTables from "views/admin/tables";
-import RTLDefault from "views/rtl/default";
-
-// Auth Imports
 import SignIn from "views/auth/SignIn";
+import SignUp from "views/auth/SignUp";
 
-// Icon Imports
+import EntriesTable from "views/admin/tables/components/EntriesTable";
+import StudentList from "views/admin/tables/components/StudentList";
+import UsersTable from "views/admin/tables/components/UsersTable";
+
+import TerminalTable from "views/admin/tables/components/TerminalTable";
+import { MdPeople } from "react-icons/md";
+
+
+// Import icons
 import {
   MdHome,
-  MdOutlineShoppingCart,
-  MdBarChart,
   MdPerson,
   MdLock,
+  MdListAlt,
 } from "react-icons/md";
+import { FaUserGraduate, FaCashRegister } from "react-icons/fa";
+
+// Import ProtectedRoute
+import ProtectedRoute from "./ProtectedRoute";
+import PlayersTable from "views/admin/tables/components/PlayersTable";
 
 const routes = [
   {
@@ -25,29 +36,68 @@ const routes = [
     layout: "/admin",
     path: "default",
     icon: <MdHome className="h-6 w-6" />,
-    component: <MainDashboard />,
+    component: (
+      <ProtectedRoute>
+        <MainDashboard />
+      </ProtectedRoute>
+    ),
   },
   {
-    name: "NFT Marketplace",
+    name: "Student",
     layout: "/admin",
-    path: "nft-marketplace",
-    icon: <MdOutlineShoppingCart className="h-6 w-6" />,
-    component: <NFTMarketplace />,
-    secondary: true,
+    path: "student",
+    icon: <FaUserGraduate className="h-6 w-6" />,
+    component: (
+      <ProtectedRoute>
+        <StudentList />
+      </ProtectedRoute>
+    ),
   },
   {
-    name: "Data Tables",
+    name: "Players",
     layout: "/admin",
-    icon: <MdBarChart className="h-6 w-6" />,
-    path: "data-tables",
-    component: <DataTables />,
+    path: "players",
+    icon: <FaFutbol  className="h-6 w-6" />, // Football icon
+    component: (
+      <ProtectedRoute>
+        <PlayersTable />
+      </ProtectedRoute>
+    ),
+  },
+  
+  {
+    name: "Entry",
+    layout: "/admin",
+    path: "entry",
+    icon: <MdListAlt className="h-6 w-6" />,
+    component: (
+      <ProtectedRoute>
+        <EntriesTable />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    name: "Terminal",
+    layout: "/admin",
+    path: "terminal",
+    icon: <FaCashRegister className="h-6 w-6" />,
+    component: (
+      <ProtectedRoute>
+        <TerminalTable />
+      </ProtectedRoute>
+    ),
   },
   {
     name: "Profile",
     layout: "/admin",
     path: "profile",
     icon: <MdPerson className="h-6 w-6" />,
-    component: <Profile />,
+    component: (
+      <ProtectedRoute>
+        <Profile />
+      </ProtectedRoute>
+    ),
+    hideInSidebar: true, // Hides this route from the sidebar
   },
   {
     name: "Sign In",
@@ -55,13 +105,29 @@ const routes = [
     path: "sign-in",
     icon: <MdLock className="h-6 w-6" />,
     component: <SignIn />,
+    hideInSidebar: true, // Hides this route from the sidebar
+
   },
   {
-    name: "RTL Admin",
-    layout: "/rtl",
-    path: "rtl",
-    icon: <MdHome className="h-6 w-6" />,
-    component: <RTLDefault />,
+    name: "Sign Up",
+    layout: "/auth",
+    path: "sign-up",
+    icon: <MdLock className="h-6 w-6" />,
+    component: <SignUp />,
+    hideInSidebar: true, // Hides this route from the sidebar
+
+  },
+  {
+    name: "Users",
+    layout: "/admin",
+    path: "users",
+    icon: <MdPeople className="h-6 w-6" />,
+    component: (
+      <ProtectedRoute>
+        <UsersTable />
+      </ProtectedRoute>
+    ),
   },
 ];
+
 export default routes;

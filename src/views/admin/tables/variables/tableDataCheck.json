@@ -51,12 +51,7 @@
     "name": ["Venus DS", false],
     "quantity": 1024,
     "date": "13.Mar.2021",
-    "progress": 25
-  },
-  {
-    "name": ["Venus 3D Asset", false],
-    "quantity": 258,
-    "date": "24.Jan.2021",
-    "progress": 100
+    "progress": 56
   }
+  
 ]

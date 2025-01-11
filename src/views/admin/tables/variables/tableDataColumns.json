@@ -1,32 +1,22 @@
 [
   {
-    "name": "Marketplace",
-    "quantity": 2458,
-    "date": "12.Jan.2021",
-    "progress": 75.5
+    "name": "John Doe",
+    "progress": 50,
+    "quantity": 10,
+    "date": "2024-12-18",
+    "status": "Active", 
+    "price": "50.00", 
+    "category": "Electronics", 
+    "actions": "View"
   },
   {
-    "name": "Venus DB PRO",
-    "quantity": 1485,
-    "date": "21.Feb.2021",
-    "progress": 35.4
-  },
-  {
-    "name": "Venus DS",
-    "quantity": 1024,
-    "date": "13.Mar.2021",
-    "progress": 25
-  },
-  {
-    "name": "Venus 3D Asset",
-    "quantity": 858,
-    "date": "24.Jan.2021",
-    "progress": 100
-  },
-  {
-    "name": "Marketplace",
-    "quantity": 258,
-    "date": "Oct 24, 2022",
-    "progress": 75
+    "name": "Jane Smith",
+    "progress": 75,
+    "quantity": 20,
+    "date": "2024-12-15",
+    "status": "Inactive", 
+    "price": "75.00", 
+    "category": "Apparel", 
+    "actions": "Edit"
   }
 ]
