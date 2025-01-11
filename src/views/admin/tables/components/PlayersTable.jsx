@@ -62,7 +62,7 @@ const [selectedPlayerData, setSelectedPlayerData] = useState(null);
 
 const fetchPlayerData = async () => {
   try {
-    const response = await axios.get("http://127.0.0.1:5000/fetchplayers");
+    const response = await axios.get("https://ksa.kempshotsportsacademy.com/fetchplayers");
     console.log("API Response Data:", response.data);
 
     const formattedPlayers = response.data.map((player) => ({
