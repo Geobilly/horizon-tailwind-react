@@ -2,7 +2,8 @@ import React, { useState } from "react";
 import InputField from "components/fields/InputField";
 import { jwtDecode } from "jwt-decode"; // Use named import
 import axios from "axios";
-import Spinner from "./Spinner"; // Adjust the import path as needed
+// import Spinner from "./Spinner"; // Adjust the import path as needed
+import CircularWithValueLabel from "..//..//../components/loader/index"; // Import the loader component
 
 
 const getSchoolIDFromToken = () => {
@@ -86,9 +87,10 @@ const AddStudent = ({ isOpen, onClose }) => {
       <div className="bg-white dark:bg-navy-700 rounded-lg shadow-lg w-full max-w-2xl p-6">
       {loading && (
   <div className="spinner-overlay">
-    <Spinner />
+    <CircularWithValueLabel size={80} color="#36d7b7" />
   </div>
 )}
+
 
           {/* Modal Header */}
           <div className="flex justify-between items-center mb-6">

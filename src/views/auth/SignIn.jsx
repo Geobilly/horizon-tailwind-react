@@ -22,18 +22,18 @@ export default function SignIn() {
   // Function to handle form submission
   const handleLogin = async (e) => {
     e.preventDefault(); // Prevent form from refreshing the page
-
+  
     // Log the email and password for debugging
     console.log("Email:", email);
     console.log("Password:", password);
-
+  
     if (!email || !password) {
       setError("Both email and password are required.");
       return;
     }
-
+  
     setLoading(true); // Start loading when the login process begins
-
+  
     try {
       const response = await fetch("https://edupay.kempshotsportsacademy.com/login", {
         method: "POST",
@@ -42,17 +42,18 @@ export default function SignIn() {
         },
         body: JSON.stringify({ email, password }), // Send email and password as JSON
       });
-
+  
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.message || "An error occurred. Please try again.");
+        // Set the error message received from the API
+        throw new Error(errorData.error || "An error occurred. Please try again.");
       }
-
+  
       const data = await response.json(); // Parse the JSON response
-
+  
       // Save the API response (token, name, etc.) to localStorage
       localStorage.setItem("Edupay", JSON.stringify(data));
-
+  
       // Reload the page after login
       window.location.reload(); // Reload the page
       
@@ -61,11 +62,13 @@ export default function SignIn() {
         navigate("/admin/default"); // Navigate to admin dashboard after reload
       }, 500); // Delay of 500ms to ensure reload happens first
     } catch (error) {
+      // Set the error message from the catch block
       setError(error.message);
     } finally {
       setLoading(false); // Stop loading after the request is completed
     }
   };
+  
 
   return (
     <div className="mt-16 mb-16 flex h-full w-full items-center justify-center px-2 md:mx-0 md:px-0 lg:mb-10 lg:items-center lg:justify-start">

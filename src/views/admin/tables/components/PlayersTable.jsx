@@ -55,7 +55,7 @@ const PlayersTable = () => {
   const [isViewPlayerOpen, setIsViewPlayerOpen] = useState(false);
 const [selectedPlayerId, setSelectedPlayerId] = useState(null);
 const [selectedPlayerData, setSelectedPlayerData] = useState(null);
-
+const [players, setPlayers] = useState([]); // Store original data
 
 
   
@@ -67,20 +67,16 @@ const fetchPlayerData = async () => {
 
     const formattedPlayers = response.data.map((player) => ({
       ...player,
-      image: player.photo
-        ? `data:image/jpeg;base64,${player.photo}` // Ensure this is a valid base64 image URL
-        : "https://via.placeholder.com/150", // Fallback for missing images
     }));
-// Sort the players by `id` in descending order
-const sortedPlayers = formattedPlayers.sort((a, b) => b.id - a.id);
-return sortedPlayers;
 
-    return formattedPlayers;
+    const sortedPlayers = formattedPlayers.sort((a, b) => b.id - a.id);
+    return sortedPlayers;
   } catch (error) {
     console.error("Error fetching player data:", error);
     return [];
   }
 };
+
 
   
 
@@ -94,28 +90,32 @@ return sortedPlayers;
   useEffect(() => {
     const fetchData = async () => {
       setIsLoading(true);
-      setHasError(false);
+      setHasError(false); // Reset error state before fetching
   
       try {
         const players = await fetchPlayerData();
         if (players.length > 0) {
-          setFilteredData(players);
+          setFilteredData(players); // Only set data when it's successfully fetched
         } else {
-          setFilteredData([]);
-          setHasError(true);
+          setFilteredData([]); // Clear data if no players are found
+          setHasError(true); // Indicate no data available
         }
       } catch (error) {
         console.error("Error fetching data:", error);
-        setFilteredData([]);
-        setHasError(true);
+        setFilteredData([]); // Ensure data is cleared in case of error
+        setHasError(true); // Indicate an error occurred
       } finally {
-        setIsLoading(false);
-        setDataLoaded(true);
+        setIsLoading(false); // Set loading to false after API request is completed
       }
     };
   
     fetchData();
-  }, []);
+  }, []); // Empty dependency array ensures this only runs once when the component mounts
+  
+  // Debug log
+  console.log(filteredData);
+  
+  
   
   
   
@@ -376,27 +376,18 @@ return sortedPlayers;
         ))}
       </thead>
       <tbody {...getTableBodyProps()}>
-  {isLoading ? ( // Show spinner while loading
+  {isLoading ? (
     <tr>
       <td colSpan={columns.length} className="flex justify-center items-center py-4">
         <Spinner />
       </td>
     </tr>
-  ) : hasError ? ( // Show error only if the API response indicates an error
+  ) : hasError || filteredData.length === 0 ? (
     <tr>
       <td colSpan={columns.length} className="flex justify-center items-center py-4">
         <div className="flex items-center">
           <AiOutlineExclamationCircle className="text-4xl text-red-500" />
           <span className="ml-2 text-lg text-gray-600">No Data Available</span>
-        </div>
-      </td>
-    </tr>
-  ) : filteredData.length === 0 ? ( // Show "No Data Found" only when data is empty and no error occurred
-    <tr>
-      <td colSpan={columns.length} className="flex justify-center items-center py-4">
-        <div className="flex items-center">
-          <AiOutlineExclamationCircle className="text-4xl text-red-500" />
-          <span className="ml-2 text-lg text-gray-600">No Data Found</span>
         </div>
       </td>
     </tr>
@@ -416,17 +407,18 @@ return sortedPlayers;
   )}
 </tbody>
 
+
     </table>
   ) : hasError ? (
     <div className="flex justify-center items-center">
       <AiOutlineExclamationCircle className="text-4xl text-red-500 justify-center items-center" /> {/* No Data Icon */}
       <span className="ml-2 text-lg text-gray-600">No Data Available</span>
     </div>
-  ) : filteredData.length === 0 ? ( // Check if the filtered data is empty
-    <div className="flex justify-center items-center">
-      <AiOutlineExclamationCircle className="text-4xl text-red-500" /> {/* No Data Found Icon */}
-      <span className="ml-2 text-lg text-gray-600">No Data Found</span>
-    </div>
+  // ) : filteredData.length === 0 ? ( // Check if the filtered data is empty
+  //   <div className="flex justify-center items-center">
+  //     <AiOutlineExclamationCircle className="text-4xl text-red-500" /> {/* No Data Found Icon */}
+  //     <span className="ml-2 text-lg text-gray-600">No Data Found</span>
+  //   </div>
   ) : (
     <table {...getTableProps()} className="w-full">
       <thead className="sticky top-0 bg-white dark:bg-navy-800">

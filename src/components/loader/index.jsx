@@ -1,16 +1,15 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import CircularProgress from '@mui/material/CircularProgress';
-import Typography from '@mui/material/Typography';
+import BounceLoader from 'react-spinners/BounceLoader'; // Import BounceLoader
 import Box from '@mui/material/Box';
 
 function CircularProgressWithLabel(props) {
   return (
     <Box sx={{ position: 'relative', display: 'inline-flex' }}>
-      <CircularProgress
-        variant="determinate"
-        {...props}
-        size={props.size}  // Add size here
+      <BounceLoader
+        size={props.size || 60} // Loader size with a default
+        color={props.color || '#007BFF'} // Default loader color is teal
+        loading={true} // Always loading
       />
       <Box
         sx={{
@@ -24,13 +23,14 @@ function CircularProgressWithLabel(props) {
           justifyContent: 'center',
         }}
       >
-        <Typography
+        {/* Uncomment to show percentage */}
+        {/* <Typography
           variant="caption"
           component="div"
           sx={{ color: 'text.secondary' }}
         >
           {`${Math.round(props.value)}%`}
-        </Typography>
+        </Typography> */}
       </Box>
     </Box>
   );
@@ -38,10 +38,11 @@ function CircularProgressWithLabel(props) {
 
 CircularProgressWithLabel.propTypes = {
   value: PropTypes.number.isRequired,
-  size: PropTypes.number,  // Define size prop type
+  size: PropTypes.number, // Define size prop type
+  color: PropTypes.string, // Define color prop type
 };
 
-export default function CircularWithValueLabel({ size = 60 }) {  // Default size is 60
+export default function CircularWithValueLabel({ size = 60, color = '#007BFF' }) {
   const [progress, setProgress] = React.useState(10);
 
   React.useEffect(() => {
@@ -53,5 +54,5 @@ export default function CircularWithValueLabel({ size = 60 }) {  // Default size
     };
   }, []);
 
-  return <CircularProgressWithLabel value={progress} size={size} />;
+  return <CircularProgressWithLabel value={progress} size={size} color={color} />;
 }

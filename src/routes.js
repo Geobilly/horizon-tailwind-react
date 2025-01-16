@@ -53,17 +53,17 @@ const routes = [
       </ProtectedRoute>
     ),
   },
-  {
-    name: "Players",
-    layout: "/admin",
-    path: "players",
-    icon: <FaFutbol  className="h-6 w-6" />, // Football icon
-    component: (
-      <ProtectedRoute>
-        <PlayersTable />
-      </ProtectedRoute>
-    ),
-  },
+  // {
+  //   name: "Players",
+  //   layout: "/admin",
+  //   path: "players",
+  //   icon: <FaFutbol  className="h-6 w-6" />, // Football icon
+  //   component: (
+  //     <ProtectedRoute>
+  //       <PlayersTable />
+  //     </ProtectedRoute>
+  //   ),
+  // },
   
   {
     name: "Entry",
