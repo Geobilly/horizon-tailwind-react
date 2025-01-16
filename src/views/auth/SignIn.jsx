@@ -35,7 +35,7 @@ export default function SignIn() {
     setLoading(true); // Start loading when the login process begins
   
     try {
-      const response = await fetch("https://edupay.kempshotsportsacademy.com/login", {
+      const response = await fetch("https://edupayapi.kempshotsportsacademy.com/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
