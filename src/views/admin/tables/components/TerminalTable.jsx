@@ -173,7 +173,7 @@ useEffect(() => {
   return (
     <TableCard extra={"w-full p-4"}>
       <header className="relative flex items-center justify-between">
-        <div className="text-xl font-bold text-navy-700 dark:text-white">Terminal </div>
+        <div className="text-xl font-bold text-navy-700 dark:text-white">Tminal </div>
         <TerminalMenuCard />
       </header>
 

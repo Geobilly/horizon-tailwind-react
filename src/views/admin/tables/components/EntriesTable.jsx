@@ -45,38 +45,42 @@ const EntriesTable = () => {
     return null;
   };
 
-  // Fetch student data from API
-  const fetchStudentData = async (schoolId) => {
-    setIsLoading(true);  // Start loading
-    try {
-      const response = await fetch(`https://edupayapi.kempshotsportsacademy.com/fetchstudents/${schoolId}`);
-      const data = await response.json();
-      setFilteredData(data.students);
-    } catch (error) {
-      console.error("Error fetching student data:", error);
-    } finally {
-      setIsLoading(false);  // Stop loading
-    }
-  };
+  // Fetch entry data from API
+const fetchEntryData = async (schoolId) => {
+  setIsLoading(true); // Start loading
+  try {
+    const response = await fetch(`https://edupayapi.kempshotsportsacademy.com/fetchentries/${schoolId}`);
+    const data = await response.json();
+    setFilteredData(data.entries);
+  } catch (error) {
+    console.error("Error fetching entry data:", error);
+  } finally {
+    setIsLoading(false); // Stop loading
+  }
+};
 
-  useEffect(() => {
+useEffect(() => {
+  const schoolId = getSchoolId();
+  if (schoolId) {
+    fetchEntryData(schoolId);
+  }
+}, []);
+
+
+useEffect(() => {
+  if (searchQuery === "") {
     const schoolId = getSchoolId();
-    if (schoolId) {
-      fetchStudentData(schoolId);
-    }
-  }, []);
+    if (schoolId) fetchEntryData(schoolId); // Call the updated fetch function
+  } else {
+    const filtered = filteredData.filter((entry) =>
+      entry.class.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      entry.terminal.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      entry.status.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+    setFilteredData(filtered);
+  }
+}, [searchQuery]);
 
-  useEffect(() => {
-    if (searchQuery === "") {
-      const schoolId = getSchoolId();
-      if (schoolId) fetchStudentData(schoolId);
-    } else {
-      const filtered = filteredData.filter((student) =>
-        student.student_name.toLowerCase().includes(searchQuery.toLowerCase())
-      );
-      setFilteredData(filtered);
-    }
-  }, [searchQuery]);
 
   const handleCheckboxChange = (student, isChecked) => {
     setSelectedStudents((prev) =>
@@ -112,8 +116,8 @@ const EntriesTable = () => {
       { Header: "ID", accessor: "id" },
       { Header: "CLASS", accessor: "class" },
       { Header: "TERMINAL", accessor: "terminal" },
-      { Header: "DATE", accessor: "date" },
-      { Header: "AMOUNT", accessor: "amount" },
+      { Header: "DATE/TIME", accessor: "created_at" },
+      { Header: "AMOUNT", accessor: "total_amount" },
       { Header: "STATUS", accessor: "status" },
       {
         Header: "ACTION",

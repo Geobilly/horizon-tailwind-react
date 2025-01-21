@@ -59,6 +59,28 @@ const ViewEntry = ({ isOpen, onClose }) => {
               <li>Barfoi Aslom</li>
             </ul>
           </div>
+          {/* Not Paid List */}
+          <div className="mb-4">
+            <h4 className="text-md font-bold text-navy-700 dark:text-white">Boarders</h4>
+            <ul className="list-decimal list-inside text-gray-700 dark:text-gray-300">
+              <li>James Bird</li>
+              <li>John Doe</li>
+              <li>Samuel Doe</li>
+              <li>Spencer</li>
+              <li>Barfoi Aslom</li>
+            </ul>
+          </div>
+          {/* Not Paid List */}
+          <div className="mb-4">
+            <h4 className="text-md font-bold text-navy-700 dark:text-white">Sponsors</h4>
+            <ul className="list-decimal list-inside text-gray-700 dark:text-gray-300">
+              <li>James Bird</li>
+              <li>John Doe</li>
+              <li>Samuel Doe</li>
+              <li>Spencer</li>
+              <li>Barfoi Aslom</li>
+            </ul>
+          </div>
 
           {/* Advance List */}
           <div className="mb-6">
