@@ -1,11 +1,71 @@
-import React from "react";
+import React, { useState } from "react";
 import Card from "components/card"; // Ensure Card is imported correctly
+import CircularWithValueLabel from "../../../components/loader/index"; // Import the loader component
 
-const ViewEntry = ({ isOpen, onClose }) => {
-  if (!isOpen) return null;
+const ViewEntry = ({ isOpen, onClose, entry }) => {
+  const [loading, setLoading] = useState(false); // Loading state for API call
+
+  if (!isOpen || !entry) return null; // Ensure entry exists before rendering
+
+  const approveEntry = async (date) => {
+    setLoading(true); // Start loading before the API call
+    try {
+      const response = await fetch("https://edupayapi.kempshotsportsacademy.com/update_status", {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          entry_date_time: date,
+        }),
+      });
+
+      if (response.ok) {
+        alert("Entry Approved");
+        onClose(); // Close the modal
+        
+
+      } else {
+        alert("Failed to approve the entry");
+      }
+    } catch (error) {
+      console.error("Error approving entry:", error);
+      alert("An error occurred while approving the entry");
+    } finally {
+      setLoading(false); // Stop loading after API call
+    }
+  };
+
+  // Categorize students from entry data
+  const categorizeStudents = (students) => {
+    const paid = [];
+    const notPaid = [];
+    const sponsors = [];
+    const advance = [];
+
+    students.forEach((student) => {
+      if (student.paid === "Yes") paid.push(student.student_name);
+      else notPaid.push(student.student_name);
+
+      if (student.sponsor === "Yes") sponsors.push(student.student_name);
+
+      if (student.number_of_advance > 0) {
+        advance.push(`${student.student_name} - ${student.number_of_advance} days`);
+      }
+    });
+
+    return { paid, notPaid, sponsors, advance };
+  };
+
+  const { paid, notPaid, sponsors, advance } = categorizeStudents(entry.students || []);
 
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
+      {loading && (
+        <div className="spinner-overlay">
+          <CircularWithValueLabel size={80} color="#36d7b7" />
+        </div>
+      )}
       <Card className="relative grid h-auto w-full max-w-2xl grid-cols-1 gap-3 rounded-[20px] bg-white bg-clip-border p-6 font-dm shadow-3xl shadow-shadow-500 dark:!bg-navy-800 dark:shadow-none">
         {/* Close Button */}
         <button
@@ -18,92 +78,81 @@ const ViewEntry = ({ isOpen, onClose }) => {
         {/* Static Entry Details */}
         <div className="flex flex-col mb-4">
           <h3 className="text-lg font-bold text-navy-700 dark:text-white mb-2">Entry Details</h3>
-
           <p className="text-gray-700 dark:text-gray-300 mb-1">
-            <strong>Class:</strong> Class 2 
+            <strong>ID:</strong> {entry.id}
           </p>
           <p className="text-gray-700 dark:text-gray-300 mb-1">
-            <strong>Terminal:</strong> Bus 
+            <strong>Class:</strong> {entry.class}
           </p>
           <p className="text-gray-700 dark:text-gray-300 mb-1">
-            <strong>Date:</strong> 12th September 2020
+            <strong>Terminal:</strong> {entry.terminal}
           </p>
           <p className="text-gray-700 dark:text-gray-300 mb-1">
-            <strong> Amount:</strong> 100
+            <strong>Date:</strong> {entry.created_at}
+          </p>
+          <p className="text-gray-700 dark:text-gray-300 mb-1">
+            <strong>Amount:</strong> {entry.total_amount}
           </p>
           <p className="text-gray-700 dark:text-gray-300">
-            <strong>Status:</strong> Pending
+            <strong>Status:</strong> {entry.status}
           </p>
         </div>
 
         {/* Scrollable Content */}
-        <div className="overflow-y-auto max-h-80 pr-3"> {/* Set max height and add padding for scrollbar */}
-          {/* Paid List */}
-          <div className="mb-4">
-            <h4 className="text-md font-bold text-navy-700 dark:text-white">Paid</h4>
-            <ul className="list-decimal list-inside text-gray-700 dark:text-gray-300">
-              <li>George Asborn</li>
-              <li>Khadel Asborn</li>
-              <li>John Asborn</li>
-            </ul>
-          </div>
+        <div className="overflow-y-auto max-h-80 pr-3">
+          {paid.length > 0 && (
+            <div className="mb-4">
+              <h4 className="text-md font-bold text-navy-700 dark:text-white">Paid</h4>
+              <ul className="list-decimal list-inside text-gray-700 dark:text-gray-300">
+                {paid.map((name, index) => (
+                  <li key={index}>{name}</li>
+                ))}
+              </ul>
+            </div>
+          )}
 
-          {/* Not Paid List */}
-          <div className="mb-4">
-            <h4 className="text-md font-bold text-navy-700 dark:text-white">Not Paid</h4>
-            <ul className="list-decimal list-inside text-gray-700 dark:text-gray-300">
-              <li>James Bird</li>
-              <li>John Doe</li>
-              <li>Samuel Doe</li>
-              <li>Spencer</li>
-              <li>Barfoi Aslom</li>
-            </ul>
-          </div>
-          {/* Not Paid List */}
-          <div className="mb-4">
-            <h4 className="text-md font-bold text-navy-700 dark:text-white">Boarders</h4>
-            <ul className="list-decimal list-inside text-gray-700 dark:text-gray-300">
-              <li>James Bird</li>
-              <li>John Doe</li>
-              <li>Samuel Doe</li>
-              <li>Spencer</li>
-              <li>Barfoi Aslom</li>
-            </ul>
-          </div>
-          {/* Not Paid List */}
-          <div className="mb-4">
-            <h4 className="text-md font-bold text-navy-700 dark:text-white">Sponsors</h4>
-            <ul className="list-decimal list-inside text-gray-700 dark:text-gray-300">
-              <li>James Bird</li>
-              <li>John Doe</li>
-              <li>Samuel Doe</li>
-              <li>Spencer</li>
-              <li>Barfoi Aslom</li>
-            </ul>
-          </div>
+          {notPaid.length > 0 && (
+            <div className="mb-4">
+              <h4 className="text-md font-bold text-navy-700 dark:text-white">Not Paid</h4>
+              <ul className="list-decimal list-inside text-gray-700 dark:text-gray-300">
+                {notPaid.map((name, index) => (
+                  <li key={index}>{name}</li>
+                ))}
+              </ul>
+            </div>
+          )}
 
-          {/* Advance List */}
-          <div className="mb-6">
-            <h4 className="text-md font-bold text-navy-700 dark:text-white">Advance</h4>
-            <ul className="list-disc list-inside text-gray-700 dark:text-gray-300">
-              <li>Banes Sum - 5 days</li>
-              <li>John Ask - 7 days</li>
-            </ul>
-          </div>
+          {sponsors.length > 0 && (
+            <div className="mb-4">
+              <h4 className="text-md font-bold text-navy-700 dark:text-white">Sponsors</h4>
+              <ul className="list-decimal list-inside text-gray-700 dark:text-gray-300">
+                {sponsors.map((name, index) => (
+                  <li key={index}>{name}</li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          {advance.length > 0 && (
+            <div className="mb-6">
+              <h4 className="text-md font-bold text-navy-700 dark:text-white">Advance</h4>
+              <ul className="list-disc list-inside text-gray-700 dark:text-gray-300">
+                {advance.map((detail, index) => (
+                  <li key={index}>{detail}</li>
+                ))}
+              </ul>
+            </div>
+          )}
         </div>
 
         {/* Action Buttons */}
         <div className="flex justify-end gap-4 mt-4">
           <button
             className="px-4 py-2 text-base font-medium text-white bg-blue-500 rounded-lg hover:bg-blue-600 active:bg-blue-700"
+            onClick={() => approveEntry(entry.created_at)}
           >
             Approve
           </button>
-          {/* <button
-            className="px-4 py-2 text-base font-medium text-white bg-red-500 rounded-lg hover:bg-red-600 active:bg-red-700"
-          >
-            Delete
-          </button> */}
         </div>
       </Card>
     </div>

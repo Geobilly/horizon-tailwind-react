@@ -27,20 +27,20 @@ const Banner = () => {
       {/* Post followers */}
       <div className="mt-6 mb-3 flex gap-4 md:!gap-14">
         <div className="flex flex-col items-center justify-center">
-          <p className="text-2xl font-bold text-navy-700 dark:text-white">125</p>
-          <p className="text-sm font-normal text-gray-600">Balance</p>
+          <p className="text-2xl font-bold text-navy-700 dark:text-white">50</p>
+          <p className="text-sm font-normal text-gray-600">Credit</p>
         </div>
         <div className="flex flex-col items-center justify-center">
           <p className="text-2xl font-bold text-navy-700 dark:text-white">
             58
           </p>
-          <p className="text-sm font-normal text-gray-600">Credit</p>
+          <p className="text-sm font-normal text-gray-600">Debit</p>
         </div>
         <div className="flex flex-col items-center justify-center">
           <p className="text-2xl font-bold text-navy-700 dark:text-white">
             78
           </p>
-          <p className="text-sm font-normal text-gray-600">Debit</p>
+          <p className="text-sm font-normal text-gray-600">Balance</p>
         </div>
       </div>
     </Card>

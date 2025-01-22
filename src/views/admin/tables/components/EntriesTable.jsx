@@ -51,8 +51,9 @@ const fetchEntryData = async (schoolId) => {
   try {
     const response = await fetch(`https://edupayapi.kempshotsportsacademy.com/fetchentries/${schoolId}`);
     const data = await response.json();
-    setFilteredData(data.entries);
-  } catch (error) {
+// Sort entries by created_at in descending order
+const sortedEntries = data.entries.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+setFilteredData(sortedEntries);  } catch (error) {
     console.error("Error fetching entry data:", error);
   } finally {
     setIsLoading(false); // Stop loading
@@ -118,8 +119,21 @@ useEffect(() => {
       { Header: "TERMINAL", accessor: "terminal" },
       { Header: "DATE/TIME", accessor: "created_at" },
       { Header: "AMOUNT", accessor: "total_amount" },
-      { Header: "STATUS", accessor: "status" },
       {
+        Header: "STATUS",
+        accessor: "status",
+        Cell: ({ value }) => (
+          <span
+            style={{
+              color: value === "Pending" ? "red" : value === "Approved" ? "green" : "black",
+              fontWeight: "bold",
+            }}
+          >
+            {value}
+          </span>
+        ),
+      },
+            {
         Header: "ACTION",
         accessor: "action",
         Cell: ({ row }) => (
