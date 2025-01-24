@@ -55,7 +55,7 @@ const AddStudent = ({ isOpen, onClose }) => {
     };
 
     try {
-      const response = await axios.post("http://127.0.0.1:5000/addstudent", studentData);
+      const response = await axios.post("https://edupayapi.kempshotsportsacademy.com/addstudent", studentData);
       alert(`Success: ${response.data.message}, Student ID: ${response.data.student_id}`);
       onClose(); // Close the modal after the success alert
     } catch (error) {
