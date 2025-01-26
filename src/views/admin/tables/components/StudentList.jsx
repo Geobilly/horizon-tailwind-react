@@ -39,7 +39,7 @@ const StudentList = () => {
   const fetchStudentData = async (schoolId) => {
     setIsLoading(true);  // Start loading
     try {
-      const response = await fetch(`https://edupayapi.kempshotsportsacademy.com/fetchstudents/${schoolId}`);
+      const response = await fetch(`https://edupaygh-backend.onrender.com/fetchstudents/${schoolId}`);
       const data = await response.json();
       setFilteredData(data.students);
     } catch (error) {

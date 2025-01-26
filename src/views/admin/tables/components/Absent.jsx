@@ -3,7 +3,7 @@ import CardMenu from "components/card/CardMenu";
 import Card from "components/card";
 import { useGlobalFilter, usePagination, useSortBy, useTable } from "react-table";
 
-const CheckTable = () => {
+const Absent = () => {
   // Define columns directly in the component
   const columns = useMemo(
     () => [
@@ -64,7 +64,7 @@ const CheckTable = () => {
     <Card extra={"w-full h-full sm:overflow-auto px-6"}>
       <header className="relative flex items-center justify-between pt-4">
         <div className="text-xl font-bold text-navy-700 dark:text-white">
-         Not Paid List
+         Absent List
         </div>
         {/* <CardMenu /> */}
       </header>
@@ -149,4 +149,4 @@ const CheckTable = () => {
   );
 };
 
-export default CheckTable;
+export default Absent;
