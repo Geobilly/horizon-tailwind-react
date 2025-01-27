@@ -25,7 +25,7 @@ const AddTerminal = ({ isOpen, onClose }) => {
     
     if (schoolId) {
       try {
-        await axios.post("http://localhost:5000/add_terminal", {
+        await axios.post("https://edupaygh-backend.onrender.com/add_terminal", {
           school_id: schoolId,
           terminal_name: terminalName,
           price: parseFloat(price),

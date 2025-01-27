@@ -44,21 +44,24 @@ const TerminalTable = () => {
   // Fetch student data from API
   // Fetch terminal data from the new API using school_id
   const fetchTerminalData = async (schoolId) => {
-    setIsLoading(true);  // Start loading
+    setIsLoading(true); // Start loading
     try {
-      const response = await fetch(`https://edupayapi.kempshotsportsacademy.com/fetchterminal/${schoolId}`);
+      const response = await fetch(`https://edupaygh-backend.onrender.com/fetchterminal/${schoolId}`);
       const data = await response.json();
-      if (Array.isArray(data)) {
-        setFilteredData(data); // Only update filteredData if the response is an array
+      
+      // Check if "terminals" exists and is an array
+      if (Array.isArray(data.terminals)) {
+        setFilteredData(data.terminals); // Update filteredData with the terminals array
       } else {
-        console.error("Received data is not an array:", data);
+        console.error("Unexpected response format:", data); // Log unexpected formats
       }
     } catch (error) {
       console.error("Error fetching terminal data:", error);
     } finally {
-      setIsLoading(false);  // Stop loading
+      setIsLoading(false); // Stop loading
     }
   };
+  
   
 
 useEffect(() => {

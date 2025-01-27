@@ -49,7 +49,7 @@ const EntriesTable = () => {
 const fetchEntryData = async (schoolId) => {
   setIsLoading(true); // Start loading
   try {
-    const response = await fetch(`https://edupayapi.kempshotsportsacademy.com/fetchentries/${schoolId}`);
+    const response = await fetch(`https://edupaygh-backend.onrender.com/fetchentries/${schoolId}`);
     const data = await response.json();
 // Sort entries by created_at in descending order
 const sortedEntries = data.entries.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));

@@ -90,9 +90,9 @@ const Dashboard = () => {
         const fetchData = async () => {
           try {
             const [studentsResponse, terminalsResponse, usersResponse] = await Promise.all([
-              axios.get(`https://edupaygh-backend.onrender.com/${schoolId}`),
-              axios.get(`https://edupaygh-backend.onrender.com/${schoolId}`),
-              axios.get(`https://edupaygh-backend.onrender.com/${schoolId}`),
+              axios.get(`https://edupaygh-backend.onrender.com/fetchstudents/${schoolId}`),
+              axios.get(`https://edupaygh-backend.onrender.com/fetchterminal/${schoolId}`),
+              axios.get(`https://edupaygh-backend.onrender.com/fetchusers/${schoolId}`),
             ]);
 
             const fetchedData = {

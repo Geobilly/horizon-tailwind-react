@@ -47,7 +47,7 @@ const AddUser = ({ isOpen, onClose }) => {
     };
 
     try {
-      const response = await axios.post("http://127.0.0.1:5000/adduser", userData);
+      const response = await axios.post("https://edupaygh-backend.onrender.com/adduser", userData);
       alert(`Success: ${response.data.message}`);
       onClose(); // Close the modal after the success alert
     } catch (error) {
