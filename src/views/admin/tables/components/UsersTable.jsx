@@ -41,7 +41,7 @@ const UsersTable = () => {
   const fetchStudentData = async (schoolId) => {
     setIsLoading(true);  // Start loading
     try {
-      const response = await fetch(`https://edupayapi.kempshotsportsacademy.com/fetchusers/${schoolId}`);
+      const response = await fetch(`https://edupaygh-backend.onrender.com/fetchusers/${schoolId}`);
       const data = await response.json();
       setFilteredData(data.users);  // Update with the "users" key from response
     } catch (error) {

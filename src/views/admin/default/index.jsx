@@ -79,39 +79,45 @@ const Dashboard = () => {
   
   useEffect(() => {
     const schoolId = getSchoolId();
-    if (schoolId) {
-      const cachedData = getDataFromLocalStorage(`schoolData_${schoolId}`);
-
-      // If data exists in localStorage, use it
-      if (cachedData) {
-        setDataCounts(cachedData);
-      } else {
-        // Otherwise, fetch the data from the API
-        const fetchData = async () => {
-          try {
-            const [studentsResponse, terminalsResponse, usersResponse] = await Promise.all([
-              axios.get(`https://edupaygh-backend.onrender.com/fetchstudents/${schoolId}`),
-              axios.get(`https://edupaygh-backend.onrender.com/fetchterminal/${schoolId}`),
-              axios.get(`https://edupaygh-backend.onrender.com/fetchusers/${schoolId}`),
-            ]);
-
-            const fetchedData = {
-              total_students: studentsResponse.data.total_students,
-              total_terminals: terminalsResponse.data.total_terminals,
-              total_users: usersResponse.data.total_users,
-            };
-
-            setDataCounts(fetchedData);
-            storeDataInLocalStorage(`schoolData_${schoolId}`, fetchedData); // Cache the encoded data
-          } catch (error) {
-            console.error("Error fetching data:", error);
-          }
+    if (!schoolId) return;
+  
+    const fetchData = async () => {
+      try {
+        const [studentsResponse, terminalsResponse, usersResponse] = await Promise.all([
+          axios.get(`https://edupaygh-backend.onrender.com/fetchstudents/${schoolId}`),
+          axios.get(`https://edupaygh-backend.onrender.com/fetchterminal/${schoolId}`),
+          axios.get(`https://edupaygh-backend.onrender.com/fetchusers/${schoolId}`),
+        ]);
+  
+        const fetchedData = {
+          total_students: studentsResponse.data.total_students,
+          total_terminals: terminalsResponse.data.total_terminals,
+          total_users: usersResponse.data.total_users,
         };
-
-        fetchData();
+  
+        setDataCounts(fetchedData);
+        storeDataInLocalStorage(`schoolData_${schoolId}`, fetchedData);
+      } catch (error) {
+        console.error("Error fetching data:", error);
       }
+    };
+  
+    // Load from cache first
+    const cachedData = getDataFromLocalStorage(`schoolData_${schoolId}`);
+    if (cachedData) {
+      setDataCounts(cachedData);
     }
+  
+    // Fetch data initially
+    fetchData();
+  
+    // Set interval to refresh data every 5 minutes (300,000ms)
+    const interval = setInterval(fetchData, 300000);
+  
+    // Cleanup interval on unmount
+    return () => clearInterval(interval);
   }, []);
+  
   
   return (
     <div>
