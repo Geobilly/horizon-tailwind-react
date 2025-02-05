@@ -1,156 +1,162 @@
-import React, { useState } from "react";
-import {
-  MdArrowDropUp,
-  MdOutlineCalendarToday,
-  MdBarChart,
-} from "react-icons/md";
+import React, { useState, useEffect } from "react";
+import { MdOutlineCalendarToday } from "react-icons/md";
 import Card from "components/card";
 import LineChart from "components/charts/LineChart";
 import MiniCalendar from "components/calendar/MiniCalendar";
-import { BsThreeDots } from "react-icons/bs";
-import TotalAmountCardMenu from "..//..//..//..//components/card/TotalAmountCardMenu";
+import { jwtDecode } from "jwt-decode";
 
-// Line chart data and options
-const lineChartDataTotalSpent = [
-  {
-    name: "Paid",
-    data: [0, 64, 48, 66, 49, 68, 56],
-    color: "#4318FF",
-  },
-  {
-    name: "Not Paid",
-    data: [0, 40, 24, 46, 20, 46, 67],
-    color: "#FF0000",
-  },
-];
+const getTodayDate = () => new Date().toISOString().split("T")[0];
 
-const lineChartOptionsTotalSpent = {
-  legend: {
-    show: false,
-  },
-  theme: {
-    mode: "light",
-  },
-  chart: {
-    type: "line",
-    toolbar: {
-      show: false,
-    },
-  },
-  dataLabels: {
-    enabled: false,
-  },
-  stroke: {
-    curve: "smooth",
-  },
-  tooltip: {
-    style: {
-      fontSize: "12px",
-      fontFamily: undefined,
-      backgroundColor: "#000000",
-    },
-    theme: "dark",
-    x: {
-      format: "dd/MM/yy HH:mm",
-    },
-  },
-  grid: {
-    show: false,
-  },
+const lineChartOptions = (isDarkMode) => ({
+  legend: { show: true },
+  theme: { mode: isDarkMode ? "dark" : "light" },
+  chart: { type: "line", toolbar: { show: false } },
+  dataLabels: { enabled: false },
+  stroke: { curve: "smooth" },
   xaxis: {
     categories: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
-    show: true,
     labels: {
-      show: true,
       style: {
-        colors: "#A3AED0",
+        colors: isDarkMode ? "#E0E0E0" : "#A3AED0",
         fontSize: "14px",
         fontWeight: "500",
       },
     },
-    axisBorder: {
-      show: false,
-    },
-    axisTicks: {
-      show: false,
-    },
   },
   yaxis: {
-    show: false,
+    labels: {
+      style: {
+        colors: isDarkMode ? "#E0E0E0" : "#A3AED0",
+      },
+    },
   },
-};
+  grid: {
+    borderColor: isDarkMode ? "#444" : "#ccc",
+  },
+  tooltip: {
+    theme: isDarkMode ? "dark" : "light",
+  },
+});
 
 const TotalSpent = () => {
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
+  const [selectedDate, setSelectedDate] = useState(getTodayDate());
+  const [categories, setCategories] = useState([]);
+  const [chartData, setChartData] = useState([]);
+  const [totalAmount, setTotalAmount] = useState(0);
+  const [isDarkMode, setIsDarkMode] = useState(false);
 
-  const toggleCalendar = () => {
-    setIsCalendarOpen(!isCalendarOpen);
+  const getSchoolId = () => {
+    const userToken = JSON.parse(localStorage.getItem("Edupay"))?.token;
+    return userToken ? jwtDecode(userToken).school_id : null;
   };
 
-  const applyFilter = () => {
-    console.log("Filter applied");
-    setIsCalendarOpen(false); // Close the calendar after applying
+  const fetchData = async () => {
+    try {
+      const schoolId = getSchoolId();
+      if (!schoolId) return null;
+
+      const response = await fetch(`https://edupaygh-backend.onrender.com/fetchreport/${schoolId}`);
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error("Error fetching data:", error);
+      return null;
+    }
   };
+
+  useEffect(() => {
+    const loadData = async () => {
+      const data = await fetchData();
+      if (data) {
+        // Filter out items where status is "Pending"
+        const filteredReport = data.report.filter(item => item.status !== 'Pending');
+  
+        const uniqueCategories = [...new Set(filteredReport.map(item => item.terminal))];
+        setCategories(uniqueCategories);
+  
+        // Calculate total amount based on filtered data
+        setTotalAmount(
+          filteredReport
+            .filter(item => selectedDate ? item.date === selectedDate : true)
+            .reduce((sum, curr) => sum + curr.totalAmount, 0)
+        );
+      }
+    };
+    loadData();
+  }, [selectedDate]);
+  
+  useEffect(() => {
+    if (categories.length === 0) return;
+  
+    const processChartData = async () => {
+      const data = await fetchData();
+      if (!data) return;
+  
+      // Filter out items where status is "Pending"
+      const filteredReport = data.report.filter(item => item.status !== 'Pending');
+  
+      const categorySeries = {};
+      categories.forEach(cat => categorySeries[cat] = new Array(7).fill(0));
+  
+      filteredReport.forEach(item => {
+        if (item.date === selectedDate && categorySeries[item.terminal]) {
+          categorySeries[item.terminal] = item.paid;
+        }
+      });
+  
+      setChartData(Object.keys(categorySeries).map(cat => ({
+        name: cat.charAt(0).toUpperCase() + cat.slice(1),
+        data: categorySeries[cat],
+      })));
+    };
+  
+    processChartData();
+  }, [categories, selectedDate]);
+  
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    setIsDarkMode(mediaQuery.matches);
+    mediaQuery.addEventListener('change', (e) => setIsDarkMode(e.matches));
+    return () => mediaQuery.removeEventListener('change', (e) => setIsDarkMode(e.matches));
+  }, []);
 
   return (
-    <Card extra="!p-[20px] text-center">
+    <Card extra="!p-[20px] text-center bg-white dark:bg-gray-900 shadow-lg dark:shadow-xl">
       <div className="flex justify-between">
-        {/* Relative container for the dropdown */}
         <div className="relative">
           <button
-            onClick={toggleCalendar}
-            className="linear mt-1 flex items-center justify-center gap-2 rounded-lg bg-lightPrimary p-2 text-gray-600 transition duration-200 hover:cursor-pointer hover:bg-gray-100 active:bg-gray-200 dark:bg-navy-700 dark:hover:opacity-90 dark:active:opacity-80"
+            onClick={() => setIsCalendarOpen(!isCalendarOpen)}
+            className="p-2 rounded-lg flex items-center gap-2 
+                      bg-lightPrimary dark:bg-gray-800 
+                      text-gray-800 dark:text-gray-300 
+                      border border-gray-300 dark:border-gray-700 
+                      shadow-md dark:shadow-lg 
+                      hover:bg-gray-100 dark:hover:bg-gray-600 transition duration-200"
           >
-            <MdOutlineCalendarToday />
-            <span className="text-sm font-medium text-gray-600">Today</span>
+            <MdOutlineCalendarToday className="text-gray-600 dark:text-gray-300" />
+            {selectedDate || "Select Date"}
           </button>
-          {/* Calendar dropdown */}
+
           {isCalendarOpen && (
-            <div className="absolute z-10 mt-2 w-64 rounded-lg bg-white p-4 shadow-lg dark:bg-navy-700">
-              <MiniCalendar />
-              <div className="mt-4 flex gap-2">
-                <button
-                  onClick={applyFilter}
-                  className="p-2 bg-blue-500 text-white rounded-lg text-sm"
-                >
-                  Apply
-                </button>
-                <button
-                  onClick={toggleCalendar}
-                  className="p-1 bg-red-500 text-white rounded-lg text-sm"
-                >
-                  Close
-                </button>
-              </div>
+            <div className="absolute z-10 mt-2 p-2 rounded-lg 
+                        bg-white dark:bg-gray-900 
+                        shadow-md border border-gray-200 dark:border-gray-700">
+              <MiniCalendar
+                onSelect={(date) => { setSelectedDate(date); setIsCalendarOpen(false); }}
+              />
             </div>
           )}
         </div>
       </div>
 
-      <div className="flex h-full w-full flex-row justify-between sm:flex-wrap lg:flex-nowrap 2xl:overflow-hidden">
-        <div className="flex flex-col">
-          <p className="mt-[20px] text-3xl font-bold text-navy-700 dark:text-white">
-            ₵3,700.00
-          </p>
-          <div className="flex flex-col items-start">
-            <p className="mt-2 text-sm text-gray-600">Total Amount</p>
-            <div className="flex flex-row items-center justify-center">
-              <MdArrowDropUp className="font-medium text-green-500" />
-              <p className="text-sm font-bold text-green-500"> +2.45% </p>
-            </div>
-            <select className="mt-2 ml-2 p-2 rounded-lg border text-sm bg-white dark:bg-navy-700 text-gray-700 dark:text-white border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500">
-              <option value="bus">Bus</option>
-              <option value="canteen">Canteen</option>
-            </select>
-          </div>
-        </div>
-        <div className="h-full w-full">
-          <LineChart
-            options={lineChartOptionsTotalSpent}
-            series={lineChartDataTotalSpent}
-          />
-        </div>
-      </div>
+      <p className="text-3xl font-bold text-gray-900 dark:text-gray-100">
+        ₵{totalAmount.toFixed(2)}
+      </p>
+      <p className="text-sm text-gray-600 dark:text-gray-400">Total Amount</p>
+
+      <LineChart options={lineChartOptions(isDarkMode)} series={chartData} />
     </Card>
   );
 };

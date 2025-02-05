@@ -1,6 +1,8 @@
 import React from "react";
 import { Navigate } from "react-router-dom";
 import { FaFutbol } from "react-icons/fa";
+import { MdAttachMoney } from "react-icons/md";
+
 
 
 // Import views
@@ -12,6 +14,8 @@ import SignUp from "views/auth/SignUp";
 import EntriesTable from "views/admin/tables/components/EntriesTable";
 import StudentList from "views/admin/tables/components/StudentList";
 import UsersTable from "views/admin/tables/components/UsersTable";
+import CreditTable from "views/admin/tables/components/CreditTable";
+
 
 import TerminalTable from "views/admin/tables/components/TerminalTable";
 import { MdPeople } from "react-icons/md";
@@ -28,7 +32,7 @@ import { FaUserGraduate, FaCashRegister } from "react-icons/fa";
 
 // Import ProtectedRoute
 import ProtectedRoute from "./ProtectedRoute";
-import PlayersTable from "views/admin/tables/components/PlayersTable";
+// import PlayersTable from "views/admin/tables/components/PlayersTable";
 
 const routes = [
   {
@@ -73,6 +77,17 @@ const routes = [
     component: (
       <ProtectedRoute>
         <EntriesTable />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    name: "Owing Student",
+    layout: "/admin",
+    path: "credit",
+    icon: <MdAttachMoney className="h-6 w-6" />,
+    component: (
+      <ProtectedRoute>
+        <CreditTable />
       </ProtectedRoute>
     ),
   },

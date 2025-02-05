@@ -41,7 +41,8 @@ const AddUser = ({ isOpen, onClose }) => {
       school_id: schoolId,
       school_name: schoolName, // Add school name
       role: e.target["role"].value,
-      classlevel: e.target["classlevel"].value,
+      classlevel: role === "teacher" ? e.target["classlevel"].value : "", // Fix here
+
 
       password: e.target["password"].value, // Include password
     };
@@ -64,11 +65,11 @@ const AddUser = ({ isOpen, onClose }) => {
     <form onSubmit={handleSubmit}>
       <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
         <div className="bg-white dark:bg-navy-700 rounded-lg shadow-lg w-full max-w-2xl p-6">
-          {loading && (
-            <div className="spinner-overlay">
-              <CircularWithValueLabel size={80} color="#36d7b7" />
-            </div>
-          )}
+         {loading && (
+           <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-[1000] backdrop-blur-md">
+             <CircularWithValueLabel size={80} color="#36d7b7" />
+           </div>
+         )}
 
           {/* Modal Header */}
           <div className="flex justify-between items-center mb-6">
@@ -88,6 +89,8 @@ const AddUser = ({ isOpen, onClose }) => {
             <InputField
               label="Full Name"
               id="name"
+              name="name"  // Add this line
+
               type="text"
               placeholder="Enter full name"
               variant="auth"
@@ -105,6 +108,8 @@ const AddUser = ({ isOpen, onClose }) => {
               label="Email Address"
               id="email"
               type="email"
+              name="email"  // Add this line
+
               placeholder="Enter email address"
               variant="auth"
             />
@@ -117,6 +122,8 @@ const AddUser = ({ isOpen, onClose }) => {
   </label>
   <select
     id="role"
+    name="role"  // Add this line
+
     className="mt-2 block w-full rounded-md border border-gray-300 bg-white py-2 px-3 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-navy-600 dark:text-white"
     required
     onChange={(e) => setRole(e.target.value)} // Track role selection
@@ -138,13 +145,25 @@ const AddUser = ({ isOpen, onClose }) => {
     </label>
     <select
       id="classlevel"
+      name="classlevel"  // Add this line
+
       className="mt-2 block w-full rounded-md border border-gray-300 bg-white py-2 px-3 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-navy-600 dark:text-white"
       required
     >
       <option value="">Select Class</option>
       <option value="Class 1">Class 1</option>
-      <option value="Class 2">Class 2</option>
-      <option value="Class 3">Class 3</option>
+                <option value="Class 2">Class 2</option>
+                <option value="Class 3">Class 3</option>
+                <option value="Class 4">Class 4</option>
+                <option value="Class 5">Class 5</option>
+                <option value="Class 6">Class 6</option>
+                <option value="JHS 1">JHS 1</option>
+                <option value="JHS 2">JHS 2</option>
+                <option value="JHS 3">JHS 3</option>
+                <option value="Nursery 2">Nursery 2</option>
+                <option value="Nursery">Nursery</option>
+                <option value="KG 1">KG 1</option>
+                <option value="KG 2">KG 2</option>
     </select>
   </div>
 )}
@@ -154,6 +173,8 @@ const AddUser = ({ isOpen, onClose }) => {
             <InputField
               label="Password"
               id="password"
+              name="password"  // Add this line
+
               type="password"
               placeholder="Enter password"
               variant="auth"

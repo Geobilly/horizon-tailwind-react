@@ -1,13 +1,9 @@
 import React, { useMemo, useState, useEffect } from "react";
 import CardMenu from "components/card/CardMenu";
 import TableCard from "components/card/EntryTableCard";
-import TerminalMenuCard from "components/card/TerminalMenuCard";
-
-// import EditStudent from "../../form/EditStudent";
-// import DeleteStudent from "../../form/DeleteStudent";
-// import PrintCode from "../../form/PrintCode";
-import EditTerminal from "../../form/EditTerminal";
-import DeleteTerminal from "../../form/DeleteTerminal";
+import EditStudent from "../../form/EditStudent";
+import DeleteStudent from "../../form/DeleteStudent";
+import PrintCode from "../../form/PrintCode";
 import { useNavigate } from "react-router-dom";
 import { AiOutlineEye, AiOutlineDelete, AiOutlineEdit } from "react-icons/ai";
 import { MdQrCode } from "react-icons/md";
@@ -15,20 +11,24 @@ import { useGlobalFilter, usePagination, useSortBy, useTable } from "react-table
 import { jwtDecode } from "jwt-decode";
 import CircularWithValueLabel from "../../../../components/loader/index"; // Import the loader component
 import { AiOutlineWarning } from "react-icons/ai"; // Import warning icon
+import { AiOutlineDollarCircle } from "react-icons/ai";
+import axios from "axios";
 
-const TerminalTable = () => {
+
+
+
+const CreditTable = () => {
   const [filteredData, setFilteredData] = useState([]);
-  // const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  // const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  // const [isPrintCodeModalOpen, setIsPrintCodeModalOpen] = useState(false);
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false); // State to manage EditStudent modal visibility
-  const [isEditTerminalModalOpen, setIsEditTerminalModalOpen] = useState(false); // State to manage EditStudent modal 
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [isPrintCodeModalOpen, setIsPrintCodeModalOpen] = useState(false);
   const [selectedStudents, setSelectedStudents] = useState([]);
   const [selectedStudentId, setSelectedStudentId] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [isLoading, setIsLoading] = useState(false);  // New loading state
 
   const navigate = useNavigate();
+  
 
   // Decode the token and get the school_id
   const getSchoolId = () => {
@@ -41,49 +41,65 @@ const TerminalTable = () => {
     return null;
   };
 
-  // Fetch student data from API
-  // Fetch terminal data from the new API using school_id
-  const fetchTerminalData = async (schoolId) => {
-    setIsLoading(true); // Start loading
+  const fetchStudentData = async (schoolId) => {
+    setIsLoading(true);  // Start loading
     try {
-      const response = await fetch(`https://edupaygh-backend.onrender.com/fetchterminal/${schoolId}`);
+      const response = await fetch(`https://edupaygh-backend.onrender.com/fetchcreditstudents/${schoolId}`);
       const data = await response.json();
+  
+      // Filter out students with status "Pending"
+      const filteredStudents = data.students.filter(student => student.status !== 'Pending');
       
-      // Check if "terminals" exists and is an array
-      if (Array.isArray(data.terminals)) {
-        setFilteredData(data.terminals); // Update filteredData with the terminals array
-      } else {
-        console.error("Unexpected response format:", data); // Log unexpected formats
-      }
+      // Set the filtered data
+      setFilteredData(filteredStudents);
     } catch (error) {
-      console.error("Error fetching terminal data:", error);
+      console.error("Error fetching student data:", error);
     } finally {
-      setIsLoading(false); // Stop loading
+      setIsLoading(false);  // Stop loading
     }
   };
   
-  
 
-useEffect(() => {
-  const schoolId = getSchoolId();
-  if (schoolId) {
-    fetchTerminalData(schoolId); // Call the updated API function
-  }
-}, []);
-
-// Search logic can remain the same or be adapted based on the fetched terminal data
-useEffect(() => {
-  if (searchQuery === "") {
+  useEffect(() => {
     const schoolId = getSchoolId();
-    if (schoolId) fetchTerminalData(schoolId); // Refresh data if no search query
-  } else {
-    const filtered = filteredData.filter((terminal) =>
-      terminal.terminal_name.toLowerCase().includes(searchQuery.toLowerCase())
-    );
-    setFilteredData(filtered); // Filter data based on search query
-  }
-}, [searchQuery]);
+    if (schoolId) {
+      fetchStudentData(schoolId);
+    }
+  }, []);
 
+  useEffect(() => {
+    if (searchQuery === "") {
+      const schoolId = getSchoolId();
+      if (schoolId) fetchStudentData(schoolId);
+    } else {
+      const filtered = filteredData.filter((student) =>
+        student.student_name.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+      setFilteredData(filtered);
+    }
+  }, [searchQuery]);
+
+  const handlePayment = async (stu_id) => {
+    setIsLoading(true);  // Start loading
+
+    if (!stu_id) {
+      alert("No student selected.");
+      return;
+    }
+  
+    try {
+      const response = await axios.patch("https://edupaygh-backend.onrender.com/paycredit", {
+        stu_id: stu_id,
+      });
+  
+      alert(response.data.message); // Show success message
+    } catch (error) {
+      console.error("Payment error:", error);
+      alert("Payment failed. Please try again.");
+    } finally {
+        setIsLoading(false);  // Stop loading
+      }
+  };
 
   const handleCheckboxChange = (student, isChecked) => {
     setSelectedStudents((prev) =>
@@ -95,7 +111,7 @@ useEffect(() => {
 
   const handleEditClick = (studentId) => {
     setSelectedStudentId(studentId);
-    // setIsEditModalOpen(true);
+    setIsEditModalOpen(true);
   };
 
   const getRoleFromToken = () => {
@@ -114,38 +130,56 @@ useEffect(() => {
   const role = getRoleFromToken();
 
 
-  const columns = useMemo(() => {
-    const baseColumns = [
-      { Header: "ID", accessor: "id" },
-      { Header: "NAME", accessor: "terminal_name" },
-      { Header: "PRICE", accessor: "price" },
-      { Header: "DATE CREATED", accessor: "updated_at" },
-    ];
-  
-    if (role !== "accountant" && role !== "teacher") {
-      baseColumns.push({
+  const columns = useMemo(
+    () => [
+      {
+        Header: "STUDENT ID",
+        accessor: "stu_id",
+        Cell: ({ row }) => {
+          const student = row.original;
+          const isChecked = selectedStudents.some(
+            (s) => s.stu_id === student.stu_id
+          );
+
+          return (
+            <div className="flex items-center gap-2">
+              <input
+                type="checkbox"
+                checked={isChecked}
+                onChange={(e) => handleCheckboxChange(student, e.target.checked)}
+                className="checkbox-style"
+              />
+              <p className="text-sm font-bold text-navy-700 dark:text-white">
+                {student.stu_id}
+              </p>
+            </div>
+          );
+        },
+      },
+      { Header: "NAME", accessor: "name" },
+      { Header: "TERMINAL", accessor: "terminal" },
+      { Header: "CLASS", accessor: "class" },
+      { Header: "DATE", accessor: "date" },
+      { Header: "STATUS", accessor: "status" },
+
+
+      {
         Header: "ACTION",
         accessor: "action",
         Cell: ({ row }) => (
           <div className="flex items-center gap-2">
-            <AiOutlineEdit
-              className="text-yellow-500 text-2xl cursor-pointer"
-              title="Edit"
-              onClick={() => setIsEditTerminalModalOpen(true)}
-            />
-            <AiOutlineDelete
-              className="text-red-500 text-2xl cursor-pointer"
-              title="Delete"
-              onClick={() => setIsDeleteModalOpen(true)}
+            <AiOutlineDollarCircle
+              className="text-blue-500 text-2xl cursor-pointer"
+              title="Pay"
+              onClick={() => handlePayment(row.original.stu_id)}
             />
           </div>
         ),
-      });
-    }
-  
-    return baseColumns;
-  }, [role]);
-  
+      },
+      
+    ],
+    [navigate, role, selectedStudents]
+  );
 
   const tableInstance = useTable(
     { columns, data: filteredData, initialState: { pageSize: 11 } },
@@ -176,8 +210,8 @@ useEffect(() => {
   return (
     <TableCard extra={"w-full p-4"}>
       <header className="relative flex items-center justify-between">
-        <div className="text-xl font-bold text-navy-700 dark:text-white">Terminal </div>
-        <TerminalMenuCard />
+        <div className="text-xl font-bold text-navy-700 dark:text-white">Owing Student</div>
+        {/* <CardMenu /> */}
       </header>
 
       <div className="flex justify-between items-center mb-4">
@@ -292,13 +326,22 @@ useEffect(() => {
 </div>
 
 
-      {/* Render the EditStudent modal */}
-      <EditTerminal isOpen={isEditTerminalModalOpen} onClose={() => setIsEditTerminalModalOpen(false)} />
-      <DeleteTerminal isOpen={isDeleteModalOpen} onClose={() => setIsDeleteModalOpen(false)} />
-
+      <EditStudent
+        isOpen={isEditModalOpen}
+        onClose={() => setIsEditModalOpen(false)}
+        studentId={selectedStudentId}
+      />
+      <DeleteStudent
+        isOpen={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+      />
+      <PrintCode
+        isOpen={isPrintCodeModalOpen}
+        onClose={() => setIsPrintCodeModalOpen(false)}
+      />
     </TableCard>
   );
 };
 
 
-export default TerminalTable;
+export default CreditTable;

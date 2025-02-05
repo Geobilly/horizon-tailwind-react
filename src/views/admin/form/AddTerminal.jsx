@@ -47,11 +47,11 @@ const AddTerminal = ({ isOpen, onClose }) => {
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
       <div className="bg-white dark:bg-navy-700 rounded-lg shadow-lg w-full max-w-2xl p-6">
-         {loading && (
-          <div className="spinner-overlay">
-            <CircularWithValueLabel size={80} color="#007BFF" />
-          </div>
-        )}
+          {loading && (
+           <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-[1000] backdrop-blur-md">
+             <CircularWithValueLabel size={80} color="#36d7b7" />
+           </div>
+         )}
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-2xl font-bold text-navy-700 dark:text-white">
             Add Terminal

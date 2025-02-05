@@ -10,7 +10,7 @@ const ViewEntry = ({ isOpen, onClose, entry }) => {
   const approveEntry = async (entry_id) => {
     setLoading(true); // Start loading before the API call
     try {
-      const response = await fetch("http://127.0.0.1:5000/update_status", {
+      const response = await fetch("https://edupaygh-backend.onrender.com/update_status", {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
@@ -42,31 +42,38 @@ const ViewEntry = ({ isOpen, onClose, entry }) => {
     const notPaid = [];
     const sponsors = [];
     const advance = [];
+    const credit = [];
+
 
     students.forEach((student) => {
       if (student.paid === "Yes") paid.push(student.student_name);
       else notPaid.push(student.student_name);
 
       if (student.sponsor === "Yes") sponsors.push(student.student_name);
+      if (student.credit === "Yes") credit.push(student.student_name);
 
       if (student.number_of_advance > 0) {
         advance.push(`${student.student_name} - ${student.number_of_advance} days`);
       }
     });
 
-    return { paid, notPaid, sponsors, advance };
+    return { paid, notPaid, sponsors, credit, advance };
   };
 
-  const { paid, notPaid, sponsors, advance } = categorizeStudents(entry.students || []);
+  const { paid, notPaid, sponsors, credit,  advance } = categorizeStudents(entry.students || []);
 
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
-      {loading && (
-        <div className="spinner-overlay">
-          <CircularWithValueLabel size={80} color="#36d7b7" />
-        </div>
-      )}
+     {loading && (
+  <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-[1000] backdrop-blur-md">
+    <CircularWithValueLabel size={80} color="#36d7b7" />
+  </div>
+)}
+
+
+
       <Card className="relative grid h-auto w-full max-w-2xl grid-cols-1 gap-3 rounded-[20px] bg-white bg-clip-border p-6 font-dm shadow-3xl shadow-shadow-500 dark:!bg-navy-800 dark:shadow-none">
+       
         {/* Close Button */}
         <button
           onClick={onClose}
@@ -141,6 +148,16 @@ const ViewEntry = ({ isOpen, onClose, entry }) => {
               <h4 className="text-md font-bold text-navy-700 dark:text-white">Advance</h4>
               <ul className="list-disc list-inside text-gray-700 dark:text-gray-300">
                 {advance.map((detail, index) => (
+                  <li key={index}>{detail}</li>
+                ))}
+              </ul>
+            </div>
+          )}
+          {credit.length > 0 && (
+            <div className="mb-6">
+              <h4 className="text-md font-bold text-navy-700 dark:text-white"> Credit</h4>
+              <ul className="list-disc list-inside text-gray-700 dark:text-gray-300">
+                {credit.map((detail, index) => (
                   <li key={index}>{detail}</li>
                 ))}
               </ul>

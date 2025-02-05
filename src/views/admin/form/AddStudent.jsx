@@ -86,10 +86,12 @@ const AddStudent = ({ isOpen, onClose }) => {
       <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
       <div className="bg-white dark:bg-navy-700 rounded-lg shadow-lg w-full max-w-2xl p-6">
       {loading && (
-  <div className="spinner-overlay">
+  <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-[1000] backdrop-blur-md">
     <CircularWithValueLabel size={80} color="#36d7b7" />
   </div>
 )}
+
+
 
 
           {/* Modal Header */}
@@ -132,6 +134,24 @@ const AddStudent = ({ isOpen, onClose }) => {
                 <option value="Class 2">Class 2</option>
                 <option value="Class 3">Class 3</option>
                 <option value="Class 4">Class 4</option>
+                <option value="Class 5">Class 5</option>
+                <option value="Class 6">Class 6</option>
+                <option value="JHS 1">JHS 1</option>
+                <option value="JHS 2">JHS 2</option>
+                <option value="JHS 3">JHS 3</option>
+                <option value="Nursery 2">Nursery 2</option>
+                <option value="Nursery">Nursery</option>
+                <option value="KG 1">KG 1</option>
+                <option value="KG 2">KG 2</option>
+
+
+
+
+
+
+
+
+
               </select>
             </div>
             <div>
