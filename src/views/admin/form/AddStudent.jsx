@@ -83,8 +83,8 @@ const AddStudent = ({ isOpen, onClose }) => {
 
   return (
     <form onSubmit={handleSubmit}>
-      <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
-      <div className="bg-white dark:bg-navy-700 rounded-lg shadow-lg w-full max-w-2xl p-6">
+<div className="fixed inset-0 flex items-center justify-center bg-black/50 backdrop-blur-md z-50">
+<div className="bg-white dark:bg-navy-700 rounded-lg shadow-lg w-full max-w-2xl p-6">
       {loading && (
   <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-[1000] backdrop-blur-md">
     <CircularWithValueLabel size={80} color="#36d7b7" />

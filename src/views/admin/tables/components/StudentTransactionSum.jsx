@@ -10,7 +10,7 @@ import ViewEntry from "../../form/ViewEntry";
 import DeleteEntry from "../../form/DeleteEntry";
 
 
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { AiOutlineEye, AiOutlineDelete, AiOutlineEdit } from "react-icons/ai";
 import { MdQrCode } from "react-icons/md";
 import { useGlobalFilter, usePagination, useSortBy, useTable } from "react-table";
@@ -20,130 +20,70 @@ import { AiOutlineWarning } from "react-icons/ai"; // Import warning icon
 
 const StudentTransactionSum = () => {
   const [filteredData, setFilteredData] = useState([]);
-  // const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  // const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  // const [isPrintCodeModalOpen, setIsPrintCodeModalOpen] = useState(false);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [selectedEntry, setSelectedEntry] = useState(null);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-
-  const [selectedStudents, setSelectedStudents] = useState([]);
-  const [selectedStudentId, setSelectedStudentId] = useState(null);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [isLoading, setIsLoading] = useState(false);  // New loading state
+  const [isLoading, setIsLoading] = useState(false);
+  const location = useLocation();
+  const studentId = location.state?.studentId;
 
   const navigate = useNavigate();
 
-  // Decode the token and get the school_id
-  const getSchoolId = () => {
-    const userToken = JSON.parse(localStorage.getItem("Edupay"))?.token;
-    if (userToken) {
-      const decodedToken = jwtDecode(userToken);  // Use jwtDecode here
-      console.log("Decoded school_id:", decodedToken.school_id);  // Log the school_id
-      return decodedToken.school_id;
-    }
-    return null;
-  };
-
-  // Fetch entry data from API
-const fetchEntryData = async (schoolId) => {
-  setIsLoading(true); // Start loading
-  try {
-    const response = await fetch(`https://edupayapi.kempshotsportsacademy.com/fetchentries/${schoolId}`);
-    const data = await response.json();
-    setFilteredData(data.entries);
-  } catch (error) {
-    console.error("Error fetching entry data:", error);
-  } finally {
-    setIsLoading(false); // Stop loading
-  }
-};
-
-useEffect(() => {
-  const schoolId = getSchoolId();
-  if (schoolId) {
-    fetchEntryData(schoolId);
-  }
-}, []);
-
-
-useEffect(() => {
-  if (searchQuery === "") {
-    const schoolId = getSchoolId();
-    if (schoolId) fetchEntryData(schoolId); // Call the updated fetch function
-  } else {
-    const filtered = filteredData.filter((entry) =>
-      entry.class.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      entry.terminal.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      entry.status.toLowerCase().includes(searchQuery.toLowerCase())
-    );
-    setFilteredData(filtered);
-  }
-}, [searchQuery]);
-
-
-  const handleCheckboxChange = (student, isChecked) => {
-    setSelectedStudents((prev) =>
-      isChecked
-        ? [...prev, student]
-        : prev.filter((s) => s.student_id !== student.student_id)
-    );
-  };
-
-  const handleEditClick = (studentId) => {
-    setSelectedStudentId(studentId);
-    // setIsEditModalOpen(true);
-  };
-
-  const getRoleFromToken = () => {
-    const tokenData = localStorage.getItem("Edupay");
-    if (tokenData) {
-      try {
-        const { token } = JSON.parse(tokenData); // Parse the stored object to extract the token
-        const decodedToken = jwtDecode(token); // Use the correct function from jwt-decode
-        return decodedToken.role; // Assuming "role" is a field in your token payload
-      } catch (error) {
-        console.error("Error decoding token:", error);
+  // Fetch student transaction data from API
+  const fetchStudentData = async () => {
+    if (!studentId) return;
+    
+    setIsLoading(true);
+    try {
+      const response = await fetch(`https://edupaygh-backend.onrender.com/fetchstudent/${studentId}`);
+      const data = await response.json();
+      if (data.transactions) {
+        setFilteredData(data.transactions);
       }
+    } catch (error) {
+      console.error("Error fetching student data:", error);
+    } finally {
+      setIsLoading(false);
     }
-    return null;
   };
-  const role = getRoleFromToken();
 
+  useEffect(() => {
+    fetchStudentData();
+  }, [studentId]);
 
   const columns = useMemo(
     () => [
       { Header: "ID", accessor: "id" },
-      { Header: "CLASS", accessor: "class" },
       { Header: "TERMINAL", accessor: "terminal" },
       { Header: "DATE/TIME", accessor: "created_at" },
-      { Header: "AMOUNT", accessor: "total_amount" },
-      { Header: "BALANCE", accessor: "balance" },
-      // { Header: "STATUS", accessor: "status" },
-      {
-        Header: "ACTION",
-        accessor: "action",
-        Cell: ({ row }) => (
-          <div className="flex items-center gap-2">
-            <AiOutlineEye
-              className="text-blue-500 text-2xl cursor-pointer"
-              title="View"
-              onClick={() => {
-                setSelectedEntry(row.original);
-                setIsViewModalOpen(true);
-              }}
-            />
-            <AiOutlineDelete
-              className="text-red-500 text-2xl cursor-pointer"
-              title="Delete"
-              onClick={() => setIsDeleteModalOpen(true)}
-            />
-          </div>
-        ),
+      { 
+        Header: "AMOUNT", 
+        accessor: "amount",
+        Cell: ({ value }) => `GH₵ ${value}`
       },
-
+      // {
+      //   Header: "ACTION",
+      //   accessor: "action",
+      //   Cell: ({ row }) => (
+      //     <div className="flex items-center gap-2">
+      //       <AiOutlineEye
+      //         className="text-blue-500 text-2xl cursor-pointer"
+      //         title="View"
+      //         onClick={() => {
+      //           setSelectedEntry(row.original);
+      //           setIsViewModalOpen(true);
+      //         }}
+      //       />
+      //       <AiOutlineDelete
+      //         className="text-red-500 text-2xl cursor-pointer"
+      //         title="Delete"
+      //         onClick={() => setIsDeleteModalOpen(true)}
+      //       />
+      //     </div>
+      //   ),
+      // },
     ],
-    [navigate, role, selectedStudents]
+    []
   );
 
   const tableInstance = useTable(
@@ -175,7 +115,7 @@ useEffect(() => {
   return (
     <TableCard extra={"w-full p-4"}>
       <header className="relative flex items-center justify-between">
-        <div className="text-xl font-bold text-navy-700 dark:text-white">Entries</div>
+        <div className="text-xl font-bold text-navy-700 dark:text-white">Transactions</div>
         <EntriesMenuCard />
       </header>
 

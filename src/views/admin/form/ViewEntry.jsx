@@ -63,8 +63,8 @@ const ViewEntry = ({ isOpen, onClose, entry }) => {
   const { paid, notPaid, sponsors, credit,  advance } = categorizeStudents(entry.students || []);
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
-     {loading && (
+<div className="fixed inset-0 flex items-center justify-center bg-black/50 backdrop-blur-md z-50">
+{loading && (
   <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-[1000] backdrop-blur-md">
     <CircularWithValueLabel size={80} color="#36d7b7" />
   </div>

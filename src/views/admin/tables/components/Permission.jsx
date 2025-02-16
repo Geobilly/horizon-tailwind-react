@@ -1,9 +1,13 @@
 import React, { useMemo, useState, useEffect } from "react";
 import CardMenu from "components/card/CardMenu";
 import TableCard from "components/card/EntryTableCard";
-import EditStudent from "../../form/EditStudent";
-import DeleteStudent from "../../form/DeleteStudent";
-import PrintCode from "../../form/PrintCode";
+import PermissionMenuCard from "components/card/PermissionMenuCard";
+
+// import EditStudent from "../../form/EditStudent";
+// import DeleteStudent from "../../form/DeleteStudent";
+// import PrintCode from "../../form/PrintCode";
+import EditTerminal from "../../form/EditTerminal";
+import DeleteTerminal from "../../form/DeleteTerminal";
 import { useNavigate } from "react-router-dom";
 import { AiOutlineEye, AiOutlineDelete, AiOutlineEdit } from "react-icons/ai";
 import { MdQrCode } from "react-icons/md";
@@ -12,11 +16,13 @@ import { jwtDecode } from "jwt-decode";
 import CircularWithValueLabel from "../../../../components/loader/index"; // Import the loader component
 import { AiOutlineWarning } from "react-icons/ai"; // Import warning icon
 
-const StudentList = () => {
+const Permission = () => {
   const [filteredData, setFilteredData] = useState([]);
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [isPrintCodeModalOpen, setIsPrintCodeModalOpen] = useState(false);
+  // const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  // const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  // const [isPrintCodeModalOpen, setIsPrintCodeModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false); // State to manage EditStudent modal visibility
+  const [isEditTerminalModalOpen, setIsEditTerminalModalOpen] = useState(false); // State to manage EditStudent modal 
   const [selectedStudents, setSelectedStudents] = useState([]);
   const [selectedStudentId, setSelectedStudentId] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
@@ -28,58 +34,36 @@ const StudentList = () => {
   const getSchoolId = () => {
     const userToken = JSON.parse(localStorage.getItem("Edupay"))?.token;
     if (userToken) {
-      const decodedToken = jwtDecode(userToken);  // Use jwtDecode here
-      console.log("Decoded school_id:", decodedToken.school_id);  // Log the school_id
+      const decodedToken = jwtDecode(userToken);
       return decodedToken.school_id;
     }
     return null;
   };
 
-  // Fetch student data from API
-  const fetchStudentData = async (schoolId) => {
-    setIsLoading(true);  // Start loading
+  // Fetch permissions data from API
+  const fetchPermissionsData = async (schoolId) => {
+    setIsLoading(true);
     try {
-      const response = await fetch(`https://edupaygh-backend.onrender.com/fetchstudents/${schoolId}`);
+      const response = await fetch(`https://edupaygh-backend.onrender.com/getpermissions/${schoolId}`);
       const data = await response.json();
-      setFilteredData(data.students);
+      if (Array.isArray(data.permissions)) {
+        // Sort the permissions array by id in descending order
+        const sortedData = data.permissions.sort((a, b) => b.id - a.id);
+        setFilteredData(sortedData);
+      }
     } catch (error) {
-      console.error("Error fetching student data:", error);
+      console.error("Error fetching permissions data:", error);
     } finally {
-      setIsLoading(false);  // Stop loading
+      setIsLoading(false);
     }
   };
 
   useEffect(() => {
     const schoolId = getSchoolId();
     if (schoolId) {
-      fetchStudentData(schoolId);
+      fetchPermissionsData(schoolId);
     }
   }, []);
-
-  useEffect(() => {
-    if (searchQuery === "") {
-      const schoolId = getSchoolId();
-      if (schoolId) fetchStudentData(schoolId);
-    } else {
-      const filtered = filteredData.filter((student) =>
-        student.student_name.toLowerCase().includes(searchQuery.toLowerCase())
-      );
-      setFilteredData(filtered);
-    }
-  }, [searchQuery]);
-
-  const handleViewClick = (studentId) => {
-    if (!studentId) {
-      console.error("Student ID is undefined!");
-      return;
-    }
-
-    console.log("Navigating with studentId:", studentId);
-    navigate("/admin/profile", { 
-      state: { studentId: studentId }  // Make sure we're passing an object with studentId
-    });
-  };
-  
 
   const handleCheckboxChange = (student, isChecked) => {
     setSelectedStudents((prev) =>
@@ -91,16 +75,16 @@ const StudentList = () => {
 
   const handleEditClick = (studentId) => {
     setSelectedStudentId(studentId);
-    setIsEditModalOpen(true);
+    // setIsEditModalOpen(true);
   };
 
   const getRoleFromToken = () => {
     const tokenData = localStorage.getItem("Edupay");
     if (tokenData) {
       try {
-        const { token } = JSON.parse(tokenData); // Parse the stored object to extract the token
-        const decodedToken = jwtDecode(token); // Use the correct function from jwt-decode
-        return decodedToken.role; // Assuming "role" is a field in your token payload
+        const { token } = JSON.parse(tokenData);
+        const decodedToken = jwtDecode(token);
+        return decodedToken.role;
       } catch (error) {
         console.error("Error decoding token:", error);
       }
@@ -109,71 +93,53 @@ const StudentList = () => {
   };
   const role = getRoleFromToken();
 
-
-  const columns = useMemo(
-    () => [
-      {
-        Header: "STUDENT ID",
-        accessor: "student_id",
-        Cell: ({ row }) => {
-          const student = row.original;
-          const isChecked = selectedStudents.some(
-            (s) => s.student_id === student.student_id
-          );
-
-          return (
-            <div className="flex items-center gap-2">
-              <input
-                type="checkbox"
-                checked={isChecked}
-                onChange={(e) => handleCheckboxChange(student, e.target.checked)}
-                className="checkbox-style"
-              />
-              <p className="text-sm font-bold text-navy-700 dark:text-white">
-                {student.student_id}
-              </p>
-            </div>
-          );
-        },
-      },
-      { Header: "NAME", accessor: "student_name" },
-      { Header: "GENDER", accessor: "gender" },
-      { Header: "CLASS", accessor: "class" },
-      {
-        Header: "ACTION",
-        accessor: "action",
-        Cell: ({ row }) => (
-          <div className="flex items-center gap-2">
-            <AiOutlineEye
-              className="text-blue-500 text-2xl cursor-pointer"
-              title="View"
-              onClick={() => handleViewClick(row.original.student_id)} // Pass student ID
-              />
-           <AiOutlineEdit
-            className={`text-yellow-500 text-2xl ${
-              role === "accountant" || role === "teacher" ? "opacity-50 cursor-not-allowed" : "cursor-pointer"
-            }`}
+  const columns = useMemo(() => [
+    { Header: "ID", accessor: "id" },
+    { Header: "STUDENT NAME", accessor: "student_name" },
+    { Header: "CLASS", accessor: "class" },
+    { Header: "TERMINAL", accessor: "terminal" },
+    { Header: "REASON", accessor: "reason" },
+    { Header: "CONTACT", accessor: "guardian_contact" },
+    { 
+      Header: "DATE", 
+      accessor: "created_at",
+    },
+    {
+      Header: "FILE",
+      accessor: "file_url",
+      Cell: ({ value }) => (
+        <a 
+          href={value} 
+          target="_blank" 
+          rel="noopener noreferrer"
+          className="text-blue-500 hover:text-blue-700"
+        >
+          <AiOutlineEye className="text-2xl" />
+        </a>
+      )
+    }
+    /* Commented out Action column
+    {
+      Header: "ACTION",
+      accessor: "action",
+      Cell: ({ row }) => (
+        <div className="flex items-center gap-2">
+          <AiOutlineEdit
+            className="text-yellow-500 text-2xl cursor-pointer"
             title="Edit"
-            onClick={() => role !== "accountant" && role !== "teacher" && handleEditClick(row.original.student_id)}
+            onClick={() => setIsEditTerminalModalOpen(true)}
           />
           <AiOutlineDelete
-            className={`text-red-500 text-2xl ${
-              role === "accountant" || role === "teacher" ? "opacity-50 cursor-not-allowed" : "cursor-pointer"
-            }`}
+            className="text-red-500 text-2xl cursor-pointer"
             title="Delete"
-            onClick={() => role !== "accountant" && role !== "teacher" && setIsDeleteModalOpen(true)}
+            onClick={() => setIsDeleteModalOpen(true)}
           />
-            <MdQrCode
-              className="text-blue-500 text-2xl cursor-pointer"
-              title="Print Qrcode"
-              onClick={() => setIsPrintCodeModalOpen(true)}
-            />
-          </div>
-        ),
-      },
-    ],
-    [navigate, role, selectedStudents]
-  );
+        </div>
+      ),
+    }
+    */
+  ], []);
+  
 
   const tableInstance = useTable(
     { columns, data: filteredData, initialState: { pageSize: 11 } },
@@ -204,8 +170,8 @@ const StudentList = () => {
   return (
     <TableCard extra={"w-full p-4"}>
       <header className="relative flex items-center justify-between">
-        <div className="text-xl font-bold text-navy-700 dark:text-white">Student</div>
-        <CardMenu />
+        <div className="text-xl font-bold text-navy-700 dark:text-white">Permissions</div>
+        <PermissionMenuCard />
       </header>
 
       <div className="flex justify-between items-center mb-4">
@@ -320,22 +286,13 @@ const StudentList = () => {
 </div>
 
 
-      <EditStudent
-        isOpen={isEditModalOpen}
-        onClose={() => setIsEditModalOpen(false)}
-        studentId={selectedStudentId}
-      />
-      <DeleteStudent
-        isOpen={isDeleteModalOpen}
-        onClose={() => setIsDeleteModalOpen(false)}
-      />
-      <PrintCode
-        isOpen={isPrintCodeModalOpen}
-        onClose={() => setIsPrintCodeModalOpen(false)}
-      />
+      {/* Render the EditStudent modal */}
+      <EditTerminal isOpen={isEditTerminalModalOpen} onClose={() => setIsEditTerminalModalOpen(false)} />
+      <DeleteTerminal isOpen={isDeleteModalOpen} onClose={() => setIsDeleteModalOpen(false)} />
+
     </TableCard>
   );
 };
 
 
-export default StudentList;
+export default Permission;

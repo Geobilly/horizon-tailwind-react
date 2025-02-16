@@ -41,7 +41,6 @@ const TerminalTable = () => {
     return null;
   };
 
-  // Fetch student data from API
   // Fetch terminal data from the new API using school_id
   const fetchTerminalData = async (schoolId) => {
     setIsLoading(true); // Start loading
@@ -51,14 +50,16 @@ const TerminalTable = () => {
       
       // Check if "terminals" exists and is an array
       if (Array.isArray(data.terminals)) {
-        setFilteredData(data.terminals); // Update filteredData with the terminals array
+        // Sort terminals by id in descending order (latest first)
+        const sortedTerminals = data.terminals.sort((a, b) => b.id - a.id);
+        setFilteredData(sortedTerminals);
       } else {
-        console.error("Unexpected response format:", data); // Log unexpected formats
+        console.error("Unexpected response format:", data);
       }
     } catch (error) {
       console.error("Error fetching terminal data:", error);
     } finally {
-      setIsLoading(false); // Stop loading
+      setIsLoading(false);
     }
   };
   

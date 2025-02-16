@@ -43,7 +43,12 @@ const UsersTable = () => {
     try {
       const response = await fetch(`https://edupaygh-backend.onrender.com/fetchusers/${schoolId}`);
       const data = await response.json();
-      setFilteredData(data.users);  // Update with the "users" key from response
+      
+      // Sort users by id in descending order (latest first)
+      if (Array.isArray(data.users)) {
+        const sortedUsers = data.users.sort((a, b) => b.id - a.id);
+        setFilteredData(sortedUsers);
+      }
     } catch (error) {
       console.error("Error fetching users data:", error);
     } finally {

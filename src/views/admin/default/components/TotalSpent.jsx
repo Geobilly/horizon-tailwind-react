@@ -154,7 +154,7 @@ const TotalSpent = () => {
       <p className="text-3xl font-bold text-gray-900 dark:text-gray-100">
         ₵{totalAmount.toFixed(2)}
       </p>
-      <p className="text-sm text-gray-600 dark:text-gray-400">Total Amount</p>
+      <p className="text-sm font-bold text-blue-600 dark:text-blue-400">Total Amount</p>
 
       <LineChart options={lineChartOptions(isDarkMode)} series={chartData} />
     </Card>

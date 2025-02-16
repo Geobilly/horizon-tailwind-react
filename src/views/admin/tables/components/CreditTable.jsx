@@ -50,8 +50,13 @@ const CreditTable = () => {
       // Filter out students with status "Pending"
       const filteredStudents = data.students.filter(student => student.status !== 'Pending');
       
-      // Set the filtered data
-      setFilteredData(filteredStudents);
+      // Sort the filtered students by date in descending order (latest first)
+      const sortedStudents = filteredStudents.sort((a, b) => {
+        return new Date(b.date) - new Date(a.date);
+      });
+      
+      // Set the sorted and filtered data
+      setFilteredData(sortedStudents);
     } catch (error) {
       console.error("Error fetching student data:", error);
     } finally {
@@ -80,25 +85,34 @@ const CreditTable = () => {
   }, [searchQuery]);
 
   const handlePayment = async (stu_id) => {
-    setIsLoading(true);  // Start loading
-
     if (!stu_id) {
       alert("No student selected.");
       return;
     }
-  
-    try {
-      const response = await axios.patch("https://edupaygh-backend.onrender.com/paycredit", {
-        stu_id: stu_id,
-      });
-  
-      alert(response.data.message); // Show success message
-    } catch (error) {
-      console.error("Payment error:", error);
-      alert("Payment failed. Please try again.");
-    } finally {
+
+    // Show confirmation dialog
+    const isConfirmed = window.confirm("Are you sure you want to process this payment?");
+    
+    if (isConfirmed) {
+      setIsLoading(true);  // Start loading
+      try {
+        const response = await axios.patch("https://edupaygh-backend.onrender.com/paycredit", {
+          stu_id: stu_id,
+        });
+    
+        alert(response.data.message); // Show success message
+      } catch (error) {
+        console.error("Payment error:", error);
+        alert("Payment failed. Please try again.");
+      } finally {
         setIsLoading(false);  // Stop loading
+        // Refresh the table data after payment
+        const schoolId = getSchoolId();
+        if (schoolId) {
+          fetchStudentData(schoolId);
+        }
       }
+    }
   };
 
   const handleCheckboxChange = (student, isChecked) => {
@@ -158,6 +172,7 @@ const CreditTable = () => {
       },
       { Header: "NAME", accessor: "name" },
       { Header: "TERMINAL", accessor: "terminal" },
+      { Header: "AMOUNT", accessor: "terminal_price" },
       { Header: "CLASS", accessor: "class" },
       { Header: "DATE", accessor: "date" },
       { Header: "STATUS", accessor: "status" },

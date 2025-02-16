@@ -8,14 +8,27 @@ const LineChart = (props) => {
 
   const updatedOptions = {
     ...options,
+    chart: {
+      ...options.chart,
+      background: isDarkMode ? '#1B2559' : '#fff',  // navy-800 for dark mode
+      foreColor: isDarkMode ? '#fff' : '#333',
+    },
     xaxis: {
       ...options.xaxis,
       labels: {
         ...options.xaxis.labels,
         style: {
           ...options.xaxis.labels.style,
-          color: isDarkMode ? "#E0E0E0" : "#A3AED0", // Light gray in dark mode, default color in light mode
+          colors: isDarkMode ? '#fff' : '#A3AED0',
         },
+      },
+      axisBorder: {
+        show: true,
+        color: isDarkMode ? '#2B3674' : '#E0E0E0'
+      },
+      axisTicks: {
+        show: true,
+        color: isDarkMode ? '#2B3674' : '#E0E0E0'
       },
     },
     yaxis: {
@@ -24,13 +37,31 @@ const LineChart = (props) => {
         ...options.yaxis.labels,
         style: {
           ...options.yaxis.labels.style,
-          color: isDarkMode ? "#E0E0E0" : "#A3AED0", // Light gray in dark mode, default color in light mode
+          colors: isDarkMode ? '#fff' : '#A3AED0',
         },
       },
     },
+    grid: {
+      ...options.grid,
+      borderColor: isDarkMode ? '#2B3674' : '#E0E0E0',
+      strokeDashArray: 5,
+    },
     tooltip: {
       ...options.tooltip,
-      theme: isDarkMode ? "dark" : "light", // Adjust tooltip theme
+      theme: isDarkMode ? 'dark' : 'light',
+      background: isDarkMode ? '#1B2559' : '#fff',
+      style: {
+        fontSize: '12px',
+        fontFamily: undefined,
+      },
+    },
+    stroke: {
+      ...options.stroke,
+      curve: 'smooth',
+    },
+    markers: {
+      ...options.markers,
+      strokeColors: isDarkMode ? '#1B2559' : '#fff',
     },
   };
 

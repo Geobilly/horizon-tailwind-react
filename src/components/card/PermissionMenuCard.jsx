@@ -2,23 +2,26 @@ import React, { useState } from "react";
 import Dropdown from "components/dropdown";
 import { AiOutlineUser } from "react-icons/ai";
 import { BsThreeDots } from "react-icons/bs";
-import { MdGroupAdd } from "react-icons/md"; // New icon for Bulk Add
+import { MdGroupAdd, } from "react-icons/md"; // New icon for Bulk Add
 import AddStudent from "../../views/admin/form/AddStudent"; // Import AddStudent component
 import BulkAdd from "../../views/admin/form/BulkAdd"; // Import BulkAdd component
-import { MdQrCode } from "react-icons/md";  // Import the Qrcode icon
+import { FaCashRegister } from "react-icons/fa";
+import AddPermission from "../../views/admin/form/AddPermission"; // Import AddStudent component
 
 
-function CardMenu(props) {
+
+
+function PermissionMenuCard(props) {
   const { transparent } = props;
   const [open, setOpen] = useState(false); // For dropdown
-  const [isAddStudentModalOpen, setIsAddStudentModalOpen] = useState(false); // For AddStudent modal
-  const [isBulkAddModalOpen, setIsBulkAddModalOpen] = useState(false); // For BulkAdd modal
+  const [isAddPermissionModalOpen, setIsAddPermissionModalOpen] = useState(false); // For AddStudent modal
+//   const [isBulkAddModalOpen, setIsBulkAddModalOpen] = useState(false); // For BulkAdd modal
 
-  const handleOpenAddStudentModal = () => setIsAddStudentModalOpen(true);
-  const handleCloseAddStudentModal = () => setIsAddStudentModalOpen(false);
+  const handleOpenAddPermissionModal = () => setIsAddPermissionModalOpen(true);
+  const handleCloseAddPermissionModal = () => setIsAddPermissionModalOpen(false);
 
-  const handleOpenBulkAddModal = () => setIsBulkAddModalOpen(true);
-  const handleCloseBulkAddModal = () => setIsBulkAddModalOpen(false);
+//   const handleOpenBulkAddModal = () => setIsBulkAddModalOpen(true);
+//   const handleCloseBulkAddModal = () => setIsBulkAddModalOpen(false);
 
   return (
     <div>
@@ -42,19 +45,17 @@ function CardMenu(props) {
           <div className="z-50 w-max rounded-xl bg-white py-3 px-4 text-sm shadow-xl shadow-shadow-500 dark:!bg-navy-700 dark:shadow-none">
             {/* Add Student Menu Item */}
             <p
-              onClick={handleOpenAddStudentModal} // Open AddStudent modal
+              onClick={handleOpenAddPermissionModal} // Open AddStudent modal
               className="hover:text-black flex cursor-pointer items-center gap-2 text-gray-600 hover:font-medium"
             >
               <span>
-                <AiOutlineUser />
+                <FaCashRegister />
               </span>
-              Add Student
+              Add Permission
             </p>
 
-            
-
             {/* Bulk Add Menu Item */}
-            <p
+            {/* <p
               onClick={handleOpenBulkAddModal} // Open BulkAdd modal
               className="hover:text-black flex cursor-pointer items-center gap-2 text-gray-600 hover:font-medium mt-2"
             >
@@ -62,31 +63,22 @@ function CardMenu(props) {
                 <MdGroupAdd />
               </span>
               Bulk Add
-            </p>
-            <p
-              onClick={handleOpenBulkAddModal} // Open BulkAdd modal
-              className="hover:text-black flex cursor-pointer items-center gap-2 text-gray-600 hover:font-medium mt-2"
-            >
-              <span>
-                <MdQrCode />
-              </span>
-              Bulk Print Qrcode
-            </p>
+            </p> */}
           </div>
         }
       />
 
       {/* Add Student Modal */}
-      {isAddStudentModalOpen && (
-        <AddStudent isOpen={isAddStudentModalOpen} onClose={handleCloseAddStudentModal} />
+      {isAddPermissionModalOpen && (
+        <AddPermission isOpen={isAddPermissionModalOpen} onClose={handleCloseAddPermissionModal} />
       )}
 
       {/* Bulk Add Modal */}
-      {isBulkAddModalOpen && (
+      {/* {isBulkAddModalOpen && (
         <BulkAdd isOpen={isBulkAddModalOpen} onClose={handleCloseBulkAddModal} />
-      )}
+      )} */}
     </div>
   );
 }
 
-export default CardMenu;
+export default PermissionMenuCard;

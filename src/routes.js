@@ -2,6 +2,7 @@ import React from "react";
 import { Navigate } from "react-router-dom";
 import { FaFutbol } from "react-icons/fa";
 import { MdAttachMoney } from "react-icons/md";
+import { MdVerifiedUser } from "react-icons/md";
 
 
 
@@ -15,6 +16,9 @@ import EntriesTable from "views/admin/tables/components/EntriesTable";
 import StudentList from "views/admin/tables/components/StudentList";
 import UsersTable from "views/admin/tables/components/UsersTable";
 import CreditTable from "views/admin/tables/components/CreditTable";
+import Permission from "views/admin/tables/components/Permission";
+
+
 
 
 import TerminalTable from "views/admin/tables/components/TerminalTable";
@@ -70,7 +74,7 @@ const routes = [
   // },
   
   {
-    name: "Entry",
+    name: "Daily Collections",
     layout: "/admin",
     path: "entry",
     icon: <MdListAlt className="h-6 w-6" />,
@@ -91,6 +95,19 @@ const routes = [
       </ProtectedRoute>
     ),
   },
+
+  {
+    name: "Permission",
+    layout: "/admin",
+    path: "permission",
+    icon: <MdVerifiedUser className="h-6 w-6" />,
+    component: (
+      <ProtectedRoute>
+        <Permission />
+      </ProtectedRoute>
+    ),
+  },
+
   {
     name: "Terminal",
     layout: "/admin",
