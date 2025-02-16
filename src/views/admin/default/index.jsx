@@ -94,8 +94,8 @@ const Dashboard = () => {
           axios.get(`https://edupaygh-backend.onrender.com/fetchstudents/${schoolId}`),
           axios.get(`https://edupaygh-backend.onrender.com/fetchterminal/${schoolId}`),
           axios.get(`https://edupaygh-backend.onrender.com/fetchusers/${schoolId}`),
-          axios.get(`http://127.0.0.1:5000/getpermissions/${schoolId}`),
-          axios.get(`http://127.0.0.1:5000/fetchcreditstudents/${schoolId}`),
+          axios.get(`https://edupaygh-backend.onrender.com/getpermissions/${schoolId}`),
+          axios.get(`https://edupaygh-backend.onrender.com/fetchcreditstudents/${schoolId}`),
         ]);
   
         const fetchedData = {
