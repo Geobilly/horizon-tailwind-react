@@ -171,7 +171,17 @@ const Permission = () => {
     <TableCard extra={"w-full p-4"}>
       <header className="relative flex items-center justify-between">
         <div className="text-xl font-bold text-navy-700 dark:text-white">Permissions</div>
-        <PermissionMenuCard />
+        <PermissionMenuCard 
+          onClose={(success) => {
+            // Only refresh if the submission was successful
+            if (success) {
+              const schoolId = getSchoolId();
+              if (schoolId) {
+                fetchPermissionsData(schoolId);
+              }
+            }
+          }}
+        />
       </header>
 
       <div className="flex justify-between items-center mb-4">
@@ -287,8 +297,28 @@ const Permission = () => {
 
 
       {/* Render the EditStudent modal */}
-      <EditTerminal isOpen={isEditTerminalModalOpen} onClose={() => setIsEditTerminalModalOpen(false)} />
-      <DeleteTerminal isOpen={isDeleteModalOpen} onClose={() => setIsDeleteModalOpen(false)} />
+      <EditTerminal 
+        isOpen={isEditTerminalModalOpen} 
+        onClose={() => {
+          setIsEditTerminalModalOpen(false);
+          // Refresh table data after closing the modal
+          const schoolId = getSchoolId();
+          if (schoolId) {
+            fetchPermissionsData(schoolId);
+          }
+        }} 
+      />
+      <DeleteTerminal 
+        isOpen={isDeleteModalOpen} 
+        onClose={() => {
+          setIsDeleteModalOpen(false);
+          // Refresh table data after closing the modal
+          const schoolId = getSchoolId();
+          if (schoolId) {
+            fetchPermissionsData(schoolId);
+          }
+        }} 
+      />
 
     </TableCard>
   );

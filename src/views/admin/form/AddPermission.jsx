@@ -97,10 +97,11 @@ const AddPermission = ({ isOpen, onClose }) => {
       setFile(null);
       setReason("");
       setSelectedTerminal("");
-      onClose();
+      onClose(true);
     } catch (error) {
       console.error("Error submitting permission:", error);
       alert(error.message || "Failed to submit permission request");
+      onClose(false);
     } finally {
       setLoading(false);
     }

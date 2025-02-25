@@ -307,7 +307,14 @@ useEffect(() => {
       {/* Modal Component */}
       <ViewEntry
         isOpen={isViewModalOpen}
-        onClose={() => setIsViewModalOpen(false)}
+        onClose={() => {
+          setIsViewModalOpen(false);
+          // Refresh table data after closing the modal
+          const schoolId = getSchoolId();
+          if (schoolId) {
+            fetchEntryData(schoolId);
+          }
+        }}
         entry={selectedEntry}
       />
 

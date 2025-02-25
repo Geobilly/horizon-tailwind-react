@@ -84,8 +84,8 @@ const CreditTable = () => {
     }
   }, [searchQuery]);
 
-  const handlePayment = async (stu_id) => {
-    if (!stu_id) {
+  const handlePayment = async (id) => {
+    if (!id) {
       alert("No student selected.");
       return;
     }
@@ -97,7 +97,7 @@ const CreditTable = () => {
       setIsLoading(true);  // Start loading
       try {
         const response = await axios.patch("https://edupaygh-backend.onrender.com/paycredit", {
-          stu_id: stu_id,
+          id: id,
         });
     
         alert(response.data.message); // Show success message
@@ -175,7 +175,34 @@ const CreditTable = () => {
       { Header: "AMOUNT", accessor: "terminal_price" },
       { Header: "CLASS", accessor: "class" },
       { Header: "DATE", accessor: "date" },
-      { Header: "STATUS", accessor: "status" },
+      { 
+        Header: "STATUS", 
+        accessor: "status",
+        Cell: ({ value }) => {
+          console.log("Status value:", value); // Debug log
+          let statusColor = '';
+          
+          switch(value.toLowerCase()) {
+            case 'paid':
+              statusColor = 'text-green-500';
+              break;
+            case 'pending':
+              statusColor = 'text-yellow-500';
+              break;
+            case 'not paid':
+              statusColor = 'text-red-500';
+              break;
+            default:
+              statusColor = 'text-red-500';
+          }
+          
+          return (
+            <span className={`font-bold ${statusColor}`}>
+              {value}
+            </span>
+          )
+        }
+      },
 
 
       {
@@ -186,7 +213,7 @@ const CreditTable = () => {
             <AiOutlineDollarCircle
               className="text-blue-500 text-2xl cursor-pointer"
               title="Pay"
-              onClick={() => handlePayment(row.original.stu_id)}
+              onClick={() => handlePayment(row.original.id)}
             />
           </div>
         ),
