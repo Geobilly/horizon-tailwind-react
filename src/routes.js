@@ -3,8 +3,9 @@ import { Navigate } from "react-router-dom";
 import { FaFutbol } from "react-icons/fa";
 import { MdAttachMoney } from "react-icons/md";
 import { MdVerifiedUser } from "react-icons/md";
-
-
+import { MdPeople } from "react-icons/md";
+import { FaCashRegister } from "react-icons/fa";
+import {jwtDecode} from "jwt-decode";
 
 // Import views
 import MainDashboard from "views/admin/default";
@@ -17,13 +18,7 @@ import StudentList from "views/admin/tables/components/StudentList";
 import UsersTable from "views/admin/tables/components/UsersTable";
 import CreditTable from "views/admin/tables/components/CreditTable";
 import Permission from "views/admin/tables/components/Permission";
-
-
-
-
 import TerminalTable from "views/admin/tables/components/TerminalTable";
-import { MdPeople } from "react-icons/md";
-
 
 // Import icons
 import {
@@ -32,11 +27,27 @@ import {
   MdLock,
   MdListAlt,
 } from "react-icons/md";
-import { FaUserGraduate, FaCashRegister } from "react-icons/fa";
+import { FaUserGraduate } from "react-icons/fa";
 
 // Import ProtectedRoute
 import ProtectedRoute from "./ProtectedRoute";
-// import PlayersTable from "views/admin/tables/components/PlayersTable";
+
+// Function to get the role from the token
+const getRoleFromToken = () => {
+  const tokenData = localStorage.getItem("Edupay");
+  if (tokenData) {
+    try {
+      const { token } = JSON.parse(tokenData); // Parse the stored object to extract the token
+      const decodedToken = jwtDecode(token); // Use the correct function from jwt-decode
+      return decodedToken.role; // Assuming "role" is a field in your token payload
+    } catch (error) {
+      console.error("Error decoding token:", error);
+    }
+  }
+  return null;
+};
+
+const role = getRoleFromToken();
 
 const routes = [
   {
@@ -109,17 +120,6 @@ const routes = [
   },
 
   {
-    name: "Terminal",
-    layout: "/admin",
-    path: "terminal",
-    icon: <FaCashRegister className="h-6 w-6" />,
-    component: (
-      <ProtectedRoute>
-        <TerminalTable />
-      </ProtectedRoute>
-    ),
-  },
-  {
     name: "Profile",
     layout: "/admin",
     path: "profile",
@@ -149,7 +149,7 @@ const routes = [
     hideInSidebar: true, // Hides this route from the sidebar
 
   },
-  {
+  role === "admin" && {
     name: "Users",
     layout: "/admin",
     path: "users",
@@ -160,6 +160,17 @@ const routes = [
       </ProtectedRoute>
     ),
   },
-];
+  role === "admin" && {
+    name: "Terminal",
+    layout: "/admin",
+    path: "terminal",
+    icon: <FaCashRegister className="h-6 w-6" />,
+    component: (
+      <ProtectedRoute>
+        <TerminalTable />
+      </ProtectedRoute>
+    ),
+  },
+].filter(Boolean); // Filter out any false values
 
 export default routes;

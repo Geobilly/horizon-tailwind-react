@@ -12,7 +12,7 @@ import { useNavigate } from "react-router-dom";
 import { AiOutlineEye, AiOutlineDelete, AiOutlineEdit } from "react-icons/ai";
 import { MdQrCode } from "react-icons/md";
 import { useGlobalFilter, usePagination, useSortBy, useTable } from "react-table";
-import { jwtDecode } from "jwt-decode";
+import {jwtDecode} from "jwt-decode";
 import CircularWithValueLabel from "../../../../components/loader/index"; // Import the loader component
 import { AiOutlineWarning } from "react-icons/ai"; // Import warning icon
 
@@ -171,17 +171,19 @@ const Permission = () => {
     <TableCard extra={"w-full p-4"}>
       <header className="relative flex items-center justify-between">
         <div className="text-xl font-bold text-navy-700 dark:text-white">Permissions</div>
-        <PermissionMenuCard 
-          onClose={(success) => {
-            // Only refresh if the submission was successful
-            if (success) {
-              const schoolId = getSchoolId();
-              if (schoolId) {
-                fetchPermissionsData(schoolId);
+        {role === "admin" && (
+          <PermissionMenuCard 
+            onClose={(success) => {
+              // Only refresh if the submission was successful
+              if (success) {
+                const schoolId = getSchoolId();
+                if (schoolId) {
+                  fetchPermissionsData(schoolId);
+                }
               }
-            }
-          }}
-        />
+            }}
+          />
+        )}
       </header>
 
       <div className="flex justify-between items-center mb-4">

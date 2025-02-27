@@ -2,6 +2,7 @@ import MiniCalendar from "components/calendar/MiniCalendar";
 import WeeklyRevenue from "views/admin/default/components/WeeklyRevenue";
 import TotalSpent from "views/admin/default/components/TotalSpent";
 import TotalOwing from "views/admin/default/components/TotalOwing";
+import TotalRevenue from "views/admin/default/components/TotalRevenue";
 import { useNavigate } from 'react-router-dom';
 
 import PieChartCard from "views/admin/default/components/PieChartCard";
@@ -213,6 +214,8 @@ const Dashboard = () => {
 
       <div className="mt-5 grid grid-cols-1 gap-5 md:grid-cols-2 h-full col-span-full">
         <CheckTable columnsData={columnsDataCheck} tableData={tableDataCheck} />
+        <TotalRevenue /> {/* Add the TotalRevenue component */}
+
       </div>
     </div>
   );
