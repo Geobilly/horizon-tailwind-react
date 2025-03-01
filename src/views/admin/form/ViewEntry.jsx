@@ -36,29 +36,33 @@ const ViewEntry = ({ isOpen, onClose, entry }) => {
   };
   
 
-  // Categorize students from entry data
   const categorizeStudents = (students) => {
     const paid = [];
-    const notPaid = [];
+    let notPaid = [];
     const sponsors = [];
     const advance = [];
     const credit = [];
-
-
+    const boarders = [];
+  
     students.forEach((student) => {
       if (student.paid === "Yes") paid.push(student.student_name);
       else notPaid.push(student.student_name);
-
+  
       if (student.sponsor === "Yes") sponsors.push(student.student_name);
       if (student.credit === "Yes") credit.push(student.student_name);
-
+      if (student.boarder === "Yes") boarders.push(student.student_name);
+  
       if (student.number_of_advance > 0) {
         advance.push(`${student.student_name} - ${student.number_of_advance} days`);
       }
     });
-
-    return { paid, notPaid, sponsors, credit, advance };
+  
+    // Remove students in sponsors or boarders from notPaid
+    notPaid = notPaid.filter(name => !sponsors.includes(name) && !boarders.includes(name));
+  
+    return { paid, notPaid, sponsors, credit, advance, boarders };
   };
+  
 
   const { paid, notPaid, sponsors, credit,  advance } = categorizeStudents(entry.students || []);
 
@@ -131,6 +135,16 @@ const ViewEntry = ({ isOpen, onClose, entry }) => {
               </ul>
             </div>
           )}
+          {notPaid.length > 0 && (
+            <div className="mb-4">
+              <h4 className="text-md font-bold text-navy-700 dark:text-white">Boarders</h4>
+              <ul className="list-decimal list-inside text-gray-700 dark:text-gray-300">
+                {notPaid.map((name, index) => (
+                  <li key={index}>{name}</li>
+                ))}
+              </ul>
+            </div>
+          )}
 
           {sponsors.length > 0 && (
             <div className="mb-4">
@@ -155,7 +169,7 @@ const ViewEntry = ({ isOpen, onClose, entry }) => {
           )}
           {credit.length > 0 && (
             <div className="mb-6">
-              <h4 className="text-md font-bold text-navy-700 dark:text-white"> Credit</h4>
+              <h4 className="text-md font-bold text-navy-700 dark:text-white"> Owing</h4>
               <ul className="list-disc list-inside text-gray-700 dark:text-gray-300">
                 {credit.map((detail, index) => (
                   <li key={index}>{detail}</li>
