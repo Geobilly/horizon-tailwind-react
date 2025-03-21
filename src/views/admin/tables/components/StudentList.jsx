@@ -194,7 +194,7 @@ const StudentList = () => {
               {/* Header */}
               <div className="bg-navy-700 text-white p-2 text-center">
                 <h2 className="text-sm font-bold m-0">STUDENT ID CARD</h2>
-                <div className="text-xs">KEMPSHOT SCHOOL</div>
+                <div className="text-xs">KEMPSHOT SCHOOL.</div>
               </div>
 
               {/* Content */}
