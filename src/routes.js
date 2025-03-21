@@ -6,6 +6,7 @@ import { MdVerifiedUser } from "react-icons/md";
 import { MdPeople } from "react-icons/md";
 import { FaCashRegister } from "react-icons/fa";
 import {jwtDecode} from "jwt-decode";
+import { MdQrCodeScanner } from "react-icons/md";
 
 // Import views
 import MainDashboard from "views/admin/default";
@@ -19,6 +20,7 @@ import UsersTable from "views/admin/tables/components/UsersTable";
 import CreditTable from "views/admin/tables/components/CreditTable";
 import Permission from "views/admin/tables/components/Permission";
 import TerminalTable from "views/admin/tables/components/TerminalTable";
+import Scanner from "views/admin/tables/components/Scanner";
 
 // Import icons
 import {
@@ -168,6 +170,17 @@ const routes = [
     component: (
       <ProtectedRoute>
         <TerminalTable />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    name: "Scanner",
+    layout: "/admin",
+    path: "scanner",
+    icon: <MdQrCodeScanner className="h-6 w-6" />,
+    component: (
+      <ProtectedRoute>
+        <Scanner />
       </ProtectedRoute>
     ),
   },

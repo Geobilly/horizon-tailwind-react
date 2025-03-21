@@ -38,7 +38,11 @@ const StudentTransactionSum = () => {
       const response = await fetch(`https://edupaygh-backend.onrender.com/fetchstudent/${studentId}`);
       const data = await response.json();
       if (data.transactions) {
-        setFilteredData(data.transactions);
+        // Sort transactions by date in descending order (newest first)
+        const sortedTransactions = data.transactions.sort((a, b) => {
+          return new Date(b.created_at) - new Date(a.created_at);
+        });
+        setFilteredData(sortedTransactions);
       }
     } catch (error) {
       console.error("Error fetching student data:", error);

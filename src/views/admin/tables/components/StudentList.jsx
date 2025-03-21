@@ -11,6 +11,9 @@ import { useGlobalFilter, usePagination, useSortBy, useTable } from "react-table
 import { jwtDecode } from "jwt-decode";
 import CircularWithValueLabel from "../../../../components/loader/index"; // Import the loader component
 import { AiOutlineWarning } from "react-icons/ai"; // Import warning icon
+import { QRCodeSVG } from 'qrcode.react';
+import html2canvas from 'html2canvas';
+import jsPDF from 'jspdf';
 
 const StudentList = () => {
   const [filteredData, setFilteredData] = useState([]);
@@ -21,6 +24,9 @@ const StudentList = () => {
   const [selectedStudentId, setSelectedStudentId] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [isLoading, setIsLoading] = useState(false);  // New loading state
+  const [isQRModalOpen, setIsQRModalOpen] = useState(false);
+  const [selectedStudentForQR, setSelectedStudentForQR] = useState(null);
+  const [isBulkQRModalOpen, setIsBulkQRModalOpen] = useState(false);
 
   const navigate = useNavigate();
 
@@ -109,6 +115,252 @@ const StudentList = () => {
   };
   const role = getRoleFromToken();
 
+  // Download helper function for single card
+  const downloadSingleCard = async (student, elementRef) => {
+    try {
+      const element = elementRef;
+      const canvas = await html2canvas(element, {
+        scale: 3,
+        backgroundColor: '#ffffff',
+        logging: false,
+        useCORS: true
+      });
+
+      const imgData = canvas.toDataURL('image/png');
+      const pdf = new jsPDF({
+        orientation: 'landscape',
+        unit: 'mm',
+        format: [54, 89]
+      });
+
+      pdf.addImage(imgData, 'PNG', 0, 0, 89, 54);
+      pdf.save(`${student.student_name}_ID_Card.pdf`);
+    } catch (error) {
+      console.error('Error generating PDF:', error);
+    }
+  };
+
+  // Download helper function for bulk cards (A4 layout)
+  const downloadBulkCards = async (students, containerRef) => {
+    try {
+      const element = containerRef;
+      const canvas = await html2canvas(element, {
+        scale: 3,
+        backgroundColor: '#ffffff',
+        logging: false,
+        useCORS: true
+      });
+
+      const imgData = canvas.toDataURL('image/png');
+      const pdf = new jsPDF({
+        orientation: 'portrait',
+        unit: 'mm',
+        format: 'a4'
+      });
+
+      pdf.addImage(imgData, 'PNG', 0, 0, 210, 297);
+      pdf.save('Student_ID_Cards.pdf');
+    } catch (error) {
+      console.error('Error generating PDF:', error);
+    }
+  };
+
+  // QR Code Modal Component
+  const QRCodeModal = ({ student, onClose }) => {
+    const qrCodeRef = React.useRef();
+
+    const qrData = JSON.stringify({
+      student_id: student.student_id,
+      name: student.student_name,
+      class: student.class,
+      gender: student.gender
+    });
+
+    return (
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+        <div className="bg-white dark:bg-navy-800 rounded-xl p-6 w-[90%] max-w-[400px]">
+          <div className="flex justify-between items-center mb-4">
+            <h3 className="text-xl font-bold text-navy-700 dark:text-white">
+              Student ID Card
+            </h3>
+            <button onClick={onClose} className="text-gray-500 hover:text-gray-700">✕</button>
+          </div>
+          
+          <div className="flex flex-col items-center">
+            <div 
+              className="w-[89mm] h-[54mm] bg-white rounded-lg shadow-lg relative overflow-hidden" 
+              ref={qrCodeRef}
+            >
+              {/* Header */}
+              <div className="bg-navy-700 text-white p-2 text-center">
+                <h2 className="text-sm font-bold m-0">STUDENT ID CARD</h2>
+                <div className="text-xs">KEMPSHOT SCHOOL</div>
+              </div>
+
+              {/* Content */}
+              <div className="flex p-3">
+                {/* Photo Section */}
+                <div className="w-[25mm] mr-3">
+                  <div className="w-full h-[30mm] border border-dashed border-navy-700 flex items-center justify-center bg-gray-50">
+                    <span className="text-[8px] text-gray-500">Photo</span>
+                  </div>
+                </div>
+
+                {/* Details Section */}
+                <div className="flex-1">
+                  <div className="mb-1">
+                    <p className="text-[8px] text-gray-600 m-0">Name</p>
+                    <p className="text-[10px] font-semibold text-navy-700 m-0">{student.student_name}</p>
+                  </div>
+                  <div className="mb-1">
+                    <p className="text-[8px] text-gray-600 m-0">Student ID</p>
+                    <p className="text-[10px] font-semibold text-navy-700 m-0">{student.student_id}</p>
+                  </div>
+                  <div className="mb-1">
+                    <p className="text-[8px] text-gray-600 m-0">Class</p>
+                    <p className="text-[10px] font-semibold text-navy-700 m-0">{student.class}</p>
+                  </div>
+                  <div className="mb-1">
+                    <p className="text-[8px] text-gray-600 m-0">Gender</p>
+                    <p className="text-[10px] font-semibold text-navy-700 m-0">{student.gender}</p>
+                  </div>
+                </div>
+
+                {/* QR Code Section */}
+                <div className="absolute right-2 bottom-2">
+                  <QRCodeSVG
+                    value={qrData}
+                    size={75}
+                    level="H"
+                    includeMargin={false}
+                  />
+                </div>
+              </div>
+
+              {/* Footer */}
+              <div className="absolute bottom-0 left-0 right-0 text-center text-[7px] text-gray-600 p-1 bg-gray-50">
+                Scan QR code to verify student details
+              </div>
+            </div>
+
+            <button
+              onClick={() => downloadSingleCard(student, qrCodeRef.current)}
+              className="mt-4 px-4 py-2 bg-navy-700 text-white rounded-lg hover:bg-navy-800"
+            >
+              Download ID Card as PDF
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  // Bulk QR Code Modal Component
+  const BulkQRCodeModal = ({ students, onClose }) => {
+    const containerRef = React.useRef();
+
+    return (
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+        <div className="bg-white dark:bg-navy-800 rounded-xl p-6 w-[90%] max-w-[800px] max-h-[90vh] overflow-y-auto">
+          <div className="flex justify-between items-center mb-4">
+            <h3 className="text-xl font-bold text-navy-700 dark:text-white">
+              Bulk ID Card Generation
+            </h3>
+            <button onClick={onClose} className="text-gray-500 hover:text-gray-700">✕</button>
+          </div>
+
+          {/* A4 Container */}
+          <div 
+            ref={containerRef}
+            className="w-[210mm] mx-auto bg-white p-[10mm]"
+            style={{
+              minHeight: '297mm',
+              display: 'grid',
+              gridTemplateColumns: 'repeat(2, 1fr)',
+              gap: '10mm',
+              gridAutoRows: '54mm'
+            }}
+          >
+            {students.map((student) => {
+              const qrData = JSON.stringify({
+                student_id: student.student_id,
+                name: student.student_name,
+                class: student.class,
+                gender: student.gender
+              });
+
+              return (
+                <div 
+                  key={student.student_id}
+                  className="w-[89mm] h-[54mm] bg-white rounded-lg shadow-lg relative overflow-hidden"
+                >
+                  {/* Header */}
+                  <div className="bg-navy-700 text-white p-2 text-center">
+                    <h2 className="text-sm font-bold m-0">STUDENT ID CARD</h2>
+                    <div className="text-xs">SCHOOL NAME HERE</div>
+                  </div>
+
+                  {/* Content */}
+                  <div className="flex p-3">
+                    {/* Photo Section */}
+                    <div className="w-[25mm] mr-3">
+                      <div className="w-full h-[30mm] border border-dashed border-navy-700 flex items-center justify-center bg-gray-50">
+                        <span className="text-[8px] text-gray-500">Photo</span>
+                      </div>
+                    </div>
+
+                    {/* Details Section */}
+                    <div className="flex-1">
+                      <div className="mb-1">
+                        <p className="text-[8px] text-gray-600 m-0">Name</p>
+                        <p className="text-[10px] font-semibold text-navy-700 m-0">{student.student_name}</p>
+                      </div>
+                      <div className="mb-1">
+                        <p className="text-[8px] text-gray-600 m-0">Student ID</p>
+                        <p className="text-[10px] font-semibold text-navy-700 m-0">{student.student_id}</p>
+                      </div>
+                      <div className="mb-1">
+                        <p className="text-[8px] text-gray-600 m-0">Class</p>
+                        <p className="text-[10px] font-semibold text-navy-700 m-0">{student.class}</p>
+                      </div>
+                      <div className="mb-1">
+                        <p className="text-[8px] text-gray-600 m-0">Gender</p>
+                        <p className="text-[10px] font-semibold text-navy-700 m-0">{student.gender}</p>
+                      </div>
+                    </div>
+
+                    {/* QR Code Section */}
+                    <div className="absolute right-2 bottom-2">
+                      <QRCodeSVG
+                        value={qrData}
+                        size={75}
+                        level="H"
+                        includeMargin={false}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Footer */}
+                  <div className="absolute bottom-0 left-0 right-0 text-center text-[7px] text-gray-600 p-1 bg-gray-50">
+                    Scan QR code to verify student details
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          <div className="mt-6 flex justify-center">
+            <button
+              onClick={() => downloadBulkCards(students, containerRef.current)}
+              className="px-6 py-2 bg-navy-700 text-white rounded-lg hover:bg-navy-800"
+            >
+              Download All ID Cards as PDF
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  };
 
   const columns = useMemo(
     () => [
@@ -147,26 +399,29 @@ const StudentList = () => {
             <AiOutlineEye
               className="text-blue-500 text-2xl cursor-pointer"
               title="View"
-              onClick={() => handleViewClick(row.original.student_id)} // Pass student ID
-              />
-           <AiOutlineEdit
-            className={`text-yellow-500 text-2xl ${
-              role === "accountant" || role === "teacher" ? "opacity-50 cursor-not-allowed" : "cursor-pointer"
-            }`}
-            title="Edit"
-            onClick={() => role !== "accountant" && role !== "teacher" && handleEditClick(row.original.student_id)}
-          />
-          <AiOutlineDelete
-            className={`text-red-500 text-2xl ${
-              role === "accountant" || role === "teacher" ? "opacity-50 cursor-not-allowed" : "cursor-pointer"
-            }`}
-            title="Delete"
-            onClick={() => role !== "accountant" && role !== "teacher" && setIsDeleteModalOpen(true)}
-          />
+              onClick={() => handleViewClick(row.original.student_id)}
+            />
+            <AiOutlineEdit
+              className={`text-yellow-500 text-2xl ${
+                role === "accountant" || role === "teacher" ? "opacity-50 cursor-not-allowed" : "cursor-pointer"
+              }`}
+              title="Edit"
+              onClick={() => role !== "accountant" && role !== "teacher" && handleEditClick(row.original.student_id)}
+            />
+            <AiOutlineDelete
+              className={`text-red-500 text-2xl ${
+                role === "accountant" || role === "teacher" ? "opacity-50 cursor-not-allowed" : "cursor-pointer"
+              }`}
+              title="Delete"
+              onClick={() => role !== "accountant" && role !== "teacher" && setIsDeleteModalOpen(true)}
+            />
             <MdQrCode
               className="text-blue-500 text-2xl cursor-pointer"
-              title="Print Qrcode"
-              onClick={() => setIsPrintCodeModalOpen(true)}
+              title="Generate QR Code"
+              onClick={() => {
+                setSelectedStudentForQR(row.original);
+                setIsQRModalOpen(true);
+              }}
             />
           </div>
         ),
@@ -205,7 +460,17 @@ const StudentList = () => {
     <TableCard extra={"w-full p-4"}>
       <header className="relative flex items-center justify-between">
         <div className="text-xl font-bold text-navy-700 dark:text-white">Student</div>
-        <CardMenu />
+        <div className="flex items-center">
+          {selectedStudents.length > 0 && (
+            <button
+              onClick={() => setIsBulkQRModalOpen(true)}
+              className="mr-4 px-4 py-2 bg-navy-700 text-white rounded-lg hover:bg-navy-800"
+            >
+              Generate Selected QR Codes ({selectedStudents.length})
+            </button>
+          )}
+          <CardMenu />
+        </div>
       </header>
 
       <div className="flex justify-between items-center mb-4">
@@ -333,6 +598,25 @@ const StudentList = () => {
         isOpen={isPrintCodeModalOpen}
         onClose={() => setIsPrintCodeModalOpen(false)}
       />
+
+      {/* Add QR Code Modal */}
+      {isQRModalOpen && selectedStudentForQR && (
+        <QRCodeModal
+          student={selectedStudentForQR}
+          onClose={() => {
+            setIsQRModalOpen(false);
+            setSelectedStudentForQR(null);
+          }}
+        />
+      )}
+
+      {/* Add Bulk QR Code Modal */}
+      {isBulkQRModalOpen && selectedStudents.length > 0 && (
+        <BulkQRCodeModal
+          students={selectedStudents}
+          onClose={() => setIsBulkQRModalOpen(false)}
+        />
+      )}
     </TableCard>
   );
 };
