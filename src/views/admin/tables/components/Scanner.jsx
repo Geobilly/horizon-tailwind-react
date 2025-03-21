@@ -58,22 +58,24 @@ const Scanner = () => {
     // Create instance of scanner with square dimensions
     const scanner = new Html5QrcodeScanner('reader', {
       qrbox: {
-        width: 500,
-        height: 500,
+        width: 250,  // Reduced size for better scanning
+        height: 250,
       },
       fps: 10,
-      aspectRatio: 1, // Force 1:1 aspect ratio
-      rememberLastUsedCamera: true,
-      showTorchButtonIfSupported: true,
     });
 
-    const success = (result) => {
-      setData(result);
-      console.log('Scanned:', result);
+    const success = (decodedText, decodedResult) => {
+      scanner.clear(); // Stop scanning after successful scan
+      setShowScanner(false); // Hide scanner
+      setData(decodedText);
+      console.log('Scanned successfully!:', decodedText);
+      // You can handle the scanned data here
+      // For example, make an API call with the scanned data
     };
 
     const error = (err) => {
       console.warn(err);
+      // Handle errors here if needed
     };
 
     scanner.render(success, error);
@@ -203,6 +205,14 @@ const Scanner = () => {
             <p className="mt-2 text-gray-600 dark:text-gray-400">
               {data}
             </p>
+            {!showScanner && (
+              <button
+                onClick={() => setShowScanner(true)}
+                className="mt-4 px-6 py-2 rounded-lg bg-navy-700 text-white hover:bg-navy-800"
+              >
+                Scan Again
+              </button>
+            )}
           </div>
         </Card>
       </div>
