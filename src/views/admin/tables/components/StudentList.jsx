@@ -169,12 +169,10 @@ const StudentList = () => {
   const QRCodeModal = ({ student, onClose }) => {
     const qrCodeRef = React.useRef();
 
-    const qrData = JSON.stringify({
-      student_id: student.student_id,
-      name: student.student_name,
-      class: student.class,
-      gender: student.gender
-    });
+    // Create a simple string format for the QR code data
+    const qrData = `STUDENT:${student.student_id}|${student.student_name}|${student.class}|${student.gender}`;
+    
+    console.log('QR Data:', qrData);
 
     return (
       <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
@@ -230,9 +228,10 @@ const StudentList = () => {
                 <div className="absolute right-2 bottom-2">
                   <QRCodeSVG
                     value={qrData}
-                    size={75}
-                    level="H"
-                    includeMargin={false}
+                    size={100}
+                    level="M"
+                    includeMargin={true}
+                    style={{ background: 'white', padding: '8px' }}
                   />
                 </div>
               </div>
@@ -282,12 +281,9 @@ const StudentList = () => {
             }}
           >
             {students.map((student) => {
-              const qrData = JSON.stringify({
-                student_id: student.student_id,
-                name: student.student_name,
-                class: student.class,
-                gender: student.gender
-              });
+              const qrData = `STUDENT:${student.student_id}|${student.student_name}|${student.class}|${student.gender}`;
+              
+              console.log('QR Data:', qrData);
 
               return (
                 <div 
@@ -333,9 +329,10 @@ const StudentList = () => {
                     <div className="absolute right-2 bottom-2">
                       <QRCodeSVG
                         value={qrData}
-                        size={75}
-                        level="H"
-                        includeMargin={false}
+                        size={100}
+                        level="M"
+                        includeMargin={true}
+                        style={{ background: 'white', padding: '8px' }}
                       />
                     </div>
                   </div>
