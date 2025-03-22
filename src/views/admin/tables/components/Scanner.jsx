@@ -85,9 +85,7 @@ const Scanner = () => {
     const success = async (decodedText, decodedResult) => {
       try {
         if (decodedText.startsWith('STUDENT:')) {
-          // Remove the 'STUDENT:' prefix first
           const studentData = decodedText.replace('STUDENT:', '');
-          // Then split the remaining data
           const [id, name, className, gender] = studentData.split('|');
           
           console.log('Parsed Student Data:', {
@@ -97,17 +95,14 @@ const Scanner = () => {
             gender
           });
 
-          // Get selected terminal details
           const terminal = terminals.find(t => t.id === selectedTerminal);
           
           if (!terminal) {
-            console.error('Terminal not found. Selected Terminal:', selectedTerminal);
-            console.log('Available Terminals:', terminals);
+            console.error('Terminal not found');
             setError('Terminal not found');
             return;
           }
 
-          // Prepare transaction data
           const transactionData = {
             student_id: id,
             student_name: name,
@@ -116,45 +111,57 @@ const Scanner = () => {
             amount: terminal.price
           };
 
-          // console.log('Attempting to send transaction data:', transactionData);
-          // console.log('Selected Terminal:', terminal);
-          // console.log('API Endpoint:', 'http://127.0.0.1:5000/debit');
-
-          // Send POST request with detailed error handling
           try {
-            const response = await axios.post('https://edupaygh-backend.onrender.com/debit', transactionData, {
-              headers: {
-                'Content-Type': 'application/json'
-              }
-            });
-            
-            console.log('API Response:', response.data);
+            const response = await axios.post('https://edupaygh-backend.onrender.com/debit', transactionData);
             
             // Play success beep
             playSuccessBeep();
             
-            // Show temporary success message
-            showTemporaryMessage(`Transaction successful for ${name}`);
-          } catch (apiError) {
-            console.error('API Error Details:', {
-              message: apiError.message,
-              response: apiError.response?.data,
-              status: apiError.response?.status,
-              headers: apiError.response?.headers
-            });
+            // Show success message with transaction details
+            const successMessage = {
+              type: 'success',
+              message: response.data.message,
+              details: {
+                name: response.data.transaction_details.student_name,
+                amount: Math.abs(response.data.transaction_details.amount),
+                terminal: response.data.transaction_details.terminal
+              }
+            };
+            setApiResponse(successMessage);
+            setTimeout(() => setApiResponse(null), 3000);
 
-            let errorMessage = 'Failed to process transaction';
-            if (apiError.response?.data?.message) {
-              errorMessage = apiError.response.data.message;
+          } catch (apiError) {
+            console.error('API Error:', apiError);
+            
+            // Handle specific error responses
+            let errorMessage = '';
+            if (apiError.response) {
+              switch (apiError.response.data.error) {
+                case 'Transaction not allowed. Similar transaction exists within 24 hours':
+                  errorMessage = 'This student has already used this terminal in the last 24 hours';
+                  break;
+                case 'Low balance':
+                  errorMessage = 'Insufficient balance for this transaction';
+                  break;
+                case 'Low balance or invalid terminal':
+                  errorMessage = 'Invalid terminal or insufficient balance';
+                  break;
+                case 'Could not fetch student balance':
+                  errorMessage = 'Unable to verify student balance';
+                  break;
+                default:
+                  errorMessage = apiError.response.data.error || 'Failed to process transaction';
+              }
             } else if (apiError.message.includes('Network Error')) {
               errorMessage = 'Cannot connect to server. Please check if the server is running.';
+            } else {
+              errorMessage = 'An unexpected error occurred';
             }
 
             setError(errorMessage);
             setTimeout(() => setError(null), 3000);
           }
         } else {
-          console.error('Invalid QR Code Format. Received:', decodedText);
           setError('Invalid QR Code Format');
           setTimeout(() => setError(null), 3000);
         }
@@ -306,10 +313,11 @@ const Scanner = () => {
                 <p className="text-green-700 dark:text-green-300">
                   {apiResponse.message}
                 </p>
-                {apiResponse.transaction_details && (
+                {apiResponse.details && (
                   <div className="mt-2 text-sm">
-                    <p>Amount: GH₵{Math.abs(apiResponse.transaction_details.amount)}</p>
-                    <p>Terminal: {apiResponse.transaction_details.terminal}</p>
+                    <p>Student: {apiResponse.details.name}</p>
+                    <p>Amount: GH₵{apiResponse.details.amount}</p>
+                    <p>Terminal: {apiResponse.details.terminal}</p>
                   </div>
                 )}
               </div>
