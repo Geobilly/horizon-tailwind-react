@@ -116,13 +116,13 @@ const Scanner = () => {
             amount: terminal.price
           };
 
-          console.log('Attempting to send transaction data:', transactionData);
-          console.log('Selected Terminal:', terminal);
-          console.log('API Endpoint:', 'http://127.0.0.1:5000/debit');
+          // console.log('Attempting to send transaction data:', transactionData);
+          // console.log('Selected Terminal:', terminal);
+          // console.log('API Endpoint:', 'http://127.0.0.1:5000/debit');
 
           // Send POST request with detailed error handling
           try {
-            const response = await axios.post('http://127.0.0.1:5000/debit', transactionData, {
+            const response = await axios.post('https://edupaygh-backend.onrender.com/debit', transactionData, {
               headers: {
                 'Content-Type': 'application/json'
               }
