@@ -84,8 +84,6 @@ const Scanner = () => {
 
     const success = async (decodedText, decodedResult) => {
       try {
-        console.log('Raw QR Code Data:', decodedText);
-        
         if (decodedText.startsWith('STUDENT:')) {
           // Remove the 'STUDENT:' prefix first
           const studentData = decodedText.replace('STUDENT:', '');
@@ -120,6 +118,7 @@ const Scanner = () => {
 
           console.log('Attempting to send transaction data:', transactionData);
           console.log('Selected Terminal:', terminal);
+          console.log('API Endpoint:', 'http://127.0.0.1:5000/debit');
 
           // Send POST request with detailed error handling
           try {
@@ -144,31 +143,30 @@ const Scanner = () => {
               headers: apiError.response?.headers
             });
 
-            if (apiError.message.includes('Network Error')) {
-              setError('Cannot connect to server. Please check if the server is running.');
-            } else if (apiError.response?.data?.message) {
-              setError(apiError.response.data.message);
-            } else {
-              setError('Failed to process transaction. Please try again.');
+            let errorMessage = 'Failed to process transaction';
+            if (apiError.response?.data?.message) {
+              errorMessage = apiError.response.data.message;
+            } else if (apiError.message.includes('Network Error')) {
+              errorMessage = 'Cannot connect to server. Please check if the server is running.';
             }
+
+            setError(errorMessage);
             setTimeout(() => setError(null), 3000);
           }
         } else {
           console.error('Invalid QR Code Format. Received:', decodedText);
-          setError('Invalid QR Code Format. Expected format: STUDENT:ID|NAME|CLASS|GENDER');
+          setError('Invalid QR Code Format');
           setTimeout(() => setError(null), 3000);
         }
       } catch (error) {
         console.error('QR Code Processing Error:', error);
-        setError('Error processing QR code. Please try scanning again.');
+        setError('Error processing QR code');
         setTimeout(() => setError(null), 3000);
       }
     };
 
     const error = (err) => {
-      console.warn('Scanner Error:', err);
-      setError('Error scanning QR code. Please try again.');
-      setTimeout(() => setError(null), 3000);
+      console.warn(err);
     };
 
     scanner.render(success, error);
