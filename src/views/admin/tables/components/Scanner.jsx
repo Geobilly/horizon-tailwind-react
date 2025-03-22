@@ -84,6 +84,8 @@ const Scanner = () => {
 
     const success = async (decodedText, decodedResult) => {
       try {
+        console.log('Raw QR Code Data:', decodedText);
+        
         if (decodedText.startsWith('STUDENT:')) {
           // Remove the 'STUDENT:' prefix first
           const studentData = decodedText.replace('STUDENT:', '');
@@ -101,7 +103,9 @@ const Scanner = () => {
           const terminal = terminals.find(t => t.id === selectedTerminal);
           
           if (!terminal) {
-            console.error('Terminal not found');
+            console.error('Terminal not found. Selected Terminal:', selectedTerminal);
+            console.log('Available Terminals:', terminals);
+            setError('Terminal not found');
             return;
           }
 
@@ -114,11 +118,17 @@ const Scanner = () => {
             amount: terminal.price
           };
 
-          console.log('Sending transaction data:', transactionData);
+          console.log('Attempting to send transaction data:', transactionData);
+          console.log('Selected Terminal:', terminal);
 
-          // Send POST request
+          // Send POST request with detailed error handling
           try {
-            const response = await axios.post('http://127.0.0.1:5000/debit', transactionData);
+            const response = await axios.post('http://127.0.0.1:5000/debit', transactionData, {
+              headers: {
+                'Content-Type': 'application/json'
+              }
+            });
+            
             console.log('API Response:', response.data);
             
             // Play success beep
@@ -126,26 +136,39 @@ const Scanner = () => {
             
             // Show temporary success message
             showTemporaryMessage(`Transaction successful for ${name}`);
-            
-            // Don't clear the scanner - let it continue scanning
           } catch (apiError) {
-            console.error('API Error:', apiError);
-            setError(apiError.response?.data?.message || 'Failed to process transaction');
+            console.error('API Error Details:', {
+              message: apiError.message,
+              response: apiError.response?.data,
+              status: apiError.response?.status,
+              headers: apiError.response?.headers
+            });
+
+            if (apiError.message.includes('Network Error')) {
+              setError('Cannot connect to server. Please check if the server is running.');
+            } else if (apiError.response?.data?.message) {
+              setError(apiError.response.data.message);
+            } else {
+              setError('Failed to process transaction. Please try again.');
+            }
             setTimeout(() => setError(null), 3000);
           }
         } else {
-          setError('Invalid QR Code Format');
+          console.error('Invalid QR Code Format. Received:', decodedText);
+          setError('Invalid QR Code Format. Expected format: STUDENT:ID|NAME|CLASS|GENDER');
           setTimeout(() => setError(null), 3000);
         }
       } catch (error) {
-        console.error('Error processing QR code:', error);
-        setError('Error processing QR code');
+        console.error('QR Code Processing Error:', error);
+        setError('Error processing QR code. Please try scanning again.');
         setTimeout(() => setError(null), 3000);
       }
     };
 
     const error = (err) => {
-      console.warn(err);
+      console.warn('Scanner Error:', err);
+      setError('Error scanning QR code. Please try again.');
+      setTimeout(() => setError(null), 3000);
     };
 
     scanner.render(success, error);
