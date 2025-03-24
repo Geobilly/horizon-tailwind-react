@@ -141,7 +141,7 @@ const Scanner = () => {
         console.log('Sending transaction data:', transactionData);
 
         try {
-          const response = await axios.post('http://127.0.0.1:5000/debit', transactionData);
+          const response = await axios.post('https://edupaygh-backend.onrender.com/debit', transactionData);
           
           // Play success beep
           playSuccessBeep();
