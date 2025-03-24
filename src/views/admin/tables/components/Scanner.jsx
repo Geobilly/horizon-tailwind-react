@@ -84,85 +84,110 @@ const Scanner = () => {
 
     const success = async (decodedText, decodedResult) => {
       try {
-        if (decodedText.startsWith('STUDENT:')) {
-          const studentData = decodedText.replace('STUDENT:', '');
-          const [id, name, className, gender] = studentData.split('|');
-          
-          console.log('Parsed Student Data:', {
-            id,
-            name,
-            className,
-            gender
-          });
+        console.log('Raw QR Code Data:', decodedText);
 
-          const terminal = terminals.find(t => t.id === selectedTerminal);
-          
-          if (!terminal) {
-            console.error('Terminal not found');
-            setError('Terminal not found');
+        let studentData;
+        let id, name, className;
+
+        // Handle both old and new QR code formats
+        if (decodedText.startsWith('STUDENT:')) {
+          // New Format: STUDENT:K-001-002|Jeffery Bukuroh|Class 1|male
+          const rawData = decodedText.replace('STUDENT:', '');
+          [id, name, className] = rawData.split('|');
+        } else {
+          try {
+            // Old Format: {"id":"K-001-002","Name":"Jeffery Bukuroh","Class":"Class 1"}
+            const parsedData = JSON.parse(decodedText);
+            id = parsedData.id;
+            name = parsedData.Name;  // Note the capital 'N' in the old format
+            className = parsedData.Class; // Note the capital 'C' in the old format
+          } catch (parseError) {
+            console.error('Error parsing QR code:', parseError);
+            setError('Invalid QR Code Format');
             return;
           }
+        }
 
-          const transactionData = {
-            student_id: id,
-            student_name: name,
-            class: className,
-            terminal: terminal.name,
-            amount: terminal.price
-          };
+        // Validate that we have all required data
+        if (!id || !name || !className) {
+          setError('Missing required student information');
+          return;
+        }
 
-          try {
-            const response = await axios.post('https://edupaygh-backend.onrender.com/debit', transactionData);
-            
-            // Play success beep
-            playSuccessBeep();
-            
-            // Show success message with transaction details
-            const successMessage = {
-              type: 'success',
-              message: response.data.message,
-              details: {
-                name: response.data.transaction_details.student_name,
-                amount: Math.abs(response.data.transaction_details.amount),
-                terminal: response.data.transaction_details.terminal
-              }
-            };
-            setApiResponse(successMessage);
-            setTimeout(() => setApiResponse(null), 3000);
+        console.log('Parsed Student Data:', {
+          id,
+          name,
+          className
+        });
 
-          } catch (apiError) {
-            console.error('API Error:', apiError);
-            
-            // Handle specific error responses
-            let errorMessage = '';
-            if (apiError.response) {
-              switch (apiError.response.data.error) {
-                case 'Transaction not allowed. Similar transaction exists within 24 hours':
-                  errorMessage = 'This student has already used this terminal in the last 24 hours';
-                  break;
-                case 'Low balance':
-                  errorMessage = 'Insufficient balance for this transaction';
-                  break;
-                case 'Low balance or invalid terminal':
-                  errorMessage = 'Invalid terminal or insufficient balance';
-                  break;
-                case 'Could not fetch student balance':
-                  errorMessage = 'Unable to verify student balance';
-                  break;
-                default:
-                  errorMessage = apiError.response.data.error || 'Failed to process transaction';
-              }
-            } else if (apiError.message.includes('Network Error')) {
-              errorMessage = 'Cannot connect to server. Please check if the server is running.';
-            } else {
-              errorMessage = 'An unexpected error occurred';
+        // Get selected terminal details
+        const terminal = terminals.find(t => t.id === selectedTerminal);
+        
+        if (!terminal) {
+          console.error('Terminal not found');
+          setError('Terminal not found');
+          return;
+        }
+
+        // Prepare transaction data (same format for both old and new QR codes)
+        const transactionData = {
+          student_id: id,
+          student_name: name,
+          class: className,
+          terminal: terminal.name,
+          amount: terminal.price
+        };
+
+        console.log('Sending transaction data:', transactionData);
+
+        try {
+          const response = await axios.post('http://127.0.0.1:5000/debit', transactionData);
+          
+          // Play success beep
+          playSuccessBeep();
+          
+          // Show success message with transaction details
+          const successMessage = {
+            type: 'success',
+            message: response.data.message,
+            details: {
+              name: response.data.transaction_details.student_name,
+              amount: Math.abs(response.data.transaction_details.amount),
+              terminal: response.data.transaction_details.terminal
             }
+          };
+          setApiResponse(successMessage);
+          setTimeout(() => setApiResponse(null), 3000);
 
-            setError(errorMessage);
-            setTimeout(() => setError(null), 3000);
+        } catch (apiError) {
+          console.error('API Error:', apiError);
+          
+          // Handle specific error responses
+          let errorMessage = '';
+          if (apiError.response) {
+            switch (apiError.response.data.error) {
+              case 'Transaction not allowed. Similar transaction exists within 24 hours':
+                errorMessage = 'This student has already used this terminal in the last 24 hours';
+                break;
+              case 'Low balance':
+                errorMessage = 'Insufficient balance for this transaction';
+                break;
+              case 'Low balance or invalid terminal':
+                errorMessage = 'Invalid terminal or insufficient balance';
+                break;
+              case 'Could not fetch student balance':
+                errorMessage = 'Unable to verify student balance';
+                break;
+              default:
+                errorMessage = apiError.response.data.error || 'Failed to process transaction';
+            }
+          } else if (apiError.message.includes('Network Error')) {
+            errorMessage = 'Cannot connect to server. Please check if the server is running.';
+          } else {
+            errorMessage = 'An unexpected error occurred';
           }
-        } else {
-          setError('Invalid QR Code Format');
+
+          setError(errorMessage);
           setTimeout(() => setError(null), 3000);
         }
       } catch (error) {
