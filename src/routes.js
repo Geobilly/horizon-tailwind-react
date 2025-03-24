@@ -173,7 +173,7 @@ const routes = [
       </ProtectedRoute>
     ),
   },
-  {
+  role === "admin" && {
     name: "Scanner",
     layout: "/admin",
     path: "scanner",
