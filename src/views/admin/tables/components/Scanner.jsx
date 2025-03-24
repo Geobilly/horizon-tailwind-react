@@ -86,7 +86,6 @@ const Scanner = () => {
       try {
         console.log('Raw QR Code Data:', decodedText);
 
-        let studentData;
         let id, name, className;
 
         // Handle both old and new QR code formats
@@ -95,12 +94,18 @@ const Scanner = () => {
           const rawData = decodedText.replace('STUDENT:', '');
           [id, name, className] = rawData.split('|');
         } else {
+          // Old Format: ID: K-001-002, Name: Jeffery Bukuroh, Class: Class 1
           try {
-            // Old Format: {"id":"K-001-002","Name":"Jeffery Bukuroh","Class":"Class 1"}
-            const parsedData = JSON.parse(decodedText);
-            id = parsedData.id;
-            name = parsedData.Name;  // Note the capital 'N' in the old format
-            className = parsedData.Class; // Note the capital 'C' in the old format
+            const matches = decodedText.match(/ID:\s*(.*?),\s*Name:\s*(.*?),\s*Class:\s*(.*)/);
+            if (matches) {
+              [, id, name, className] = matches;
+              // Trim whitespace from extracted values
+              id = id.trim();
+              name = name.trim();
+              className = className.trim();
+            } else {
+              throw new Error('Invalid old format');
+            }
           } catch (parseError) {
             console.error('Error parsing QR code:', parseError);
             setError('Invalid QR Code Format');
@@ -110,6 +115,7 @@ const Scanner = () => {
 
         // Validate that we have all required data
         if (!id || !name || !className) {
+          console.error('Missing data:', { id, name, className });
           setError('Missing required student information');
           return;
         }
@@ -141,7 +147,7 @@ const Scanner = () => {
         console.log('Sending transaction data:', transactionData);
 
         try {
-          const response = await axios.post('https://edupaygh-backend.onrender.com/debit', transactionData);
+          const response = await axios.post('http://127.0.0.1:5000/debit', transactionData);
           
           // Play success beep
           playSuccessBeep();
