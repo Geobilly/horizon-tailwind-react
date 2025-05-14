@@ -293,7 +293,7 @@ const StudentList = () => {
                   {/* Header */}
                   <div className="bg-navy-700 text-white p-2 text-center">
                     <h2 className="text-sm font-bold m-0">STUDENT ID CARD</h2>
-                    <div className="text-xs">SCHOOL NAME HERE</div>
+                    <div className="text-xs">KEMPSHOT SCHOOL</div>
                   </div>
 
                   {/* Content */}
@@ -362,7 +362,28 @@ const StudentList = () => {
   const columns = useMemo(
     () => [
       {
-        Header: "STUDENT ID",
+        Header: () => {
+          // Determine if all students are selected
+          const allSelected = filteredData.length > 0 && selectedStudents.length === filteredData.length;
+          return (
+            <div className="flex items-center gap-2">
+              <input
+                type="checkbox"
+                checked={allSelected}
+                onChange={(e) => {
+                  if (e.target.checked) {
+                    setSelectedStudents(filteredData);
+                  } else {
+                    setSelectedStudents([]);
+                  }
+                }}
+                className="checkbox-style"
+                title="Select All"
+              />
+              <span>STUDENT ID</span>
+            </div>
+          );
+        },
         accessor: "student_id",
         Cell: ({ row }) => {
           const student = row.original;
