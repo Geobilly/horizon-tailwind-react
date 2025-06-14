@@ -38,7 +38,6 @@ const ViewEntry = ({ isOpen, onClose, entry }) => {
 
   const categorizeStudents = (students) => {
     const paid = [];
-    let notPaid = [];
     const sponsors = [];
     const advance = [];
     const credit = [];
@@ -46,35 +45,27 @@ const ViewEntry = ({ isOpen, onClose, entry }) => {
   
     students.forEach((student) => {
       if (student.paid === "Yes") paid.push(student.student_name);
-      else notPaid.push(student.student_name);
-  
       if (student.sponsor === "Yes") sponsors.push(student.student_name);
       if (student.credit === "Yes") credit.push(student.student_name);
       if (student.boarder === "Yes") boarders.push(student.student_name);
-  
       if (student.number_of_advance > 0) {
         advance.push(`${student.student_name} - ${student.number_of_advance} days`);
       }
     });
   
-    // Remove students in sponsors or boarders from notPaid
-    notPaid = notPaid.filter(name => !sponsors.includes(name) && !boarders.includes(name));
-  
-    return { paid, notPaid, sponsors, credit, advance, boarders };
+    return { paid, sponsors, credit, advance, boarders };
   };
   
 
-  const { paid, notPaid, sponsors, credit,  advance } = categorizeStudents(entry.students || []);
+  const { paid, sponsors, credit, advance, boarders } = categorizeStudents(entry.students || []);
 
   return (
-<div className="fixed inset-0 flex items-center justify-center bg-black/50 backdrop-blur-md z-50">
-{loading && (
-  <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-[1000] backdrop-blur-md">
-    <CircularWithValueLabel size={80} color="#36d7b7" />
-  </div>
-)}
-
-
+    <div className="fixed inset-0 flex items-center justify-center bg-black/50 backdrop-blur-md z-50">
+      {loading && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-[1000] backdrop-blur-md">
+          <CircularWithValueLabel size={80} color="#36d7b7" />
+        </div>
+      )}
 
       <Card className="relative grid h-auto w-full max-w-2xl grid-cols-1 gap-3 rounded-[20px] bg-white bg-clip-border p-6 font-dm shadow-3xl shadow-shadow-500 dark:!bg-navy-800 dark:shadow-none">
        
@@ -105,7 +96,7 @@ const ViewEntry = ({ isOpen, onClose, entry }) => {
             <strong>Date:</strong> {entry.created_at}
           </p>
           <p className="text-gray-700 dark:text-gray-300 mb-1">
-            <strong>Amount:</strong> {entry.total_amount}
+            <strong>Amount:</strong> {entry.total_amount} mb-1 solistic 
           </p>
           <p className="text-gray-700 dark:text-gray-300">
             <strong>Status:</strong> {entry.status}
@@ -125,32 +116,22 @@ const ViewEntry = ({ isOpen, onClose, entry }) => {
             </div>
           )}
 
-          {notPaid.length > 0 && (
+          {sponsors.length > 0 && (
             <div className="mb-4">
-              <h4 className="text-md font-bold text-navy-700 dark:text-white">Not Paid</h4>
+              <h4 className="text-md font-bold text-navy-700 dark:text-white">Sponsors</h4>
               <ul className="list-decimal list-inside text-gray-700 dark:text-gray-300">
-                {notPaid.map((name, index) => (
-                  <li key={index}>{name}</li>
-                ))}
-              </ul>
-            </div>
-          )}
-          {notPaid.length > 0 && (
-            <div className="mb-4">
-              <h4 className="text-md font-bold text-navy-700 dark:text-white">Boarders</h4>
-              <ul className="list-decimal list-inside text-gray-700 dark:text-gray-300">
-                {notPaid.map((name, index) => (
+                {sponsors.map((name, index) => (
                   <li key={index}>{name}</li>
                 ))}
               </ul>
             </div>
           )}
 
-          {sponsors.length > 0 && (
+          {boarders.length > 0 && (
             <div className="mb-4">
-              <h4 className="text-md font-bold text-navy-700 dark:text-white">Sponsors</h4>
+              <h4 className="text-md font-bold text-navy-700 dark:text-white">Boarders</h4>
               <ul className="list-decimal list-inside text-gray-700 dark:text-gray-300">
-                {sponsors.map((name, index) => (
+                {boarders.map((name, index) => (
                   <li key={index}>{name}</li>
                 ))}
               </ul>
@@ -167,9 +148,10 @@ const ViewEntry = ({ isOpen, onClose, entry }) => {
               </ul>
             </div>
           )}
+
           {credit.length > 0 && (
             <div className="mb-6">
-              <h4 className="text-md font-bold text-navy-700 dark:text-white"> Owing</h4>
+              <h4 className="text-md font-bold text-navy-700 dark:text-white">Owing</h4>
               <ul className="list-disc list-inside text-gray-700 dark:text-gray-300">
                 {credit.map((detail, index) => (
                   <li key={index}>{detail}</li>
@@ -184,7 +166,7 @@ const ViewEntry = ({ isOpen, onClose, entry }) => {
           <button
             className="px-4 py-2 text-base font-medium text-white bg-blue-500 rounded-lg hover:bg-blue-600 active:bg-blue-700"
             onClick={() => approveEntry(entry.entry_id)}
-            >
+          >
             Approve
           </button>
         </div>

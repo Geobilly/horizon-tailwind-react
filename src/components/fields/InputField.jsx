@@ -12,6 +12,7 @@ function InputField(props) {
     disabled,
     value,
     onChange, // Accept onChange as a prop
+    endAdornment,
   } = props;
 
   return (
@@ -24,23 +25,30 @@ function InputField(props) {
       >
         {label}
       </label>
-      <input
-        disabled={disabled}
-        type={type}
-        id={id}
-        placeholder={placeholder}
-        value={value} // Bind the value prop
-        onChange={onChange} // Pass the onChange handler
-        className={`mt-2 flex h-12 w-full items-center justify-center rounded-xl border bg-white/0 p-3 text-sm outline-none ${
-          disabled === true
-            ? "!border-none !bg-gray-100 dark:!bg-white/5 dark:placeholder:!text-[rgba(255,255,255,0.15)]"
-            : state === "error"
-            ? "border-red-500 text-red-500 placeholder:text-red-500 dark:!border-red-400 dark:!text-red-400 dark:placeholder:!text-red-400"
-            : state === "success"
-            ? "border-green-500 text-green-500 placeholder:text-green-500 dark:!border-green-400 dark:!text-green-400 dark:placeholder:!text-green-400"
-            : "border-gray-200 dark:!border-white/10 dark:text-white"
-        }`}
-      />
+      <div className="relative">
+        <input
+          disabled={disabled}
+          type={type}
+          id={id}
+          placeholder={placeholder}
+          value={value} // Bind the value prop
+          onChange={onChange} // Pass the onChange handler
+          className={`mt-2 flex h-12 w-full items-center justify-center rounded-xl border bg-white/0 p-3 text-sm outline-none ${
+            disabled === true
+              ? "!border-none !bg-gray-100 dark:!bg-white/5 dark:placeholder:!text-[rgba(255,255,255,0.15)]"
+              : state === "error"
+              ? "border-red-500 text-red-500 placeholder:text-red-500 dark:!border-red-400 dark:!text-red-400 dark:placeholder:!text-red-400"
+              : state === "success"
+              ? "border-green-500 text-green-500 placeholder:text-green-500 dark:!border-green-400 dark:!text-green-400 dark:placeholder:!text-green-400"
+              : "border-gray-200 dark:!border-white/10 dark:text-white"
+          }`}
+        />
+        {endAdornment && (
+          <div className="absolute right-3 top-1/2 -translate-y-1/2">
+            {endAdornment}
+          </div>
+        )}
+      </div>
     </div>
   );
 }

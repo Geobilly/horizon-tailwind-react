@@ -7,12 +7,18 @@ import { MdPeople } from "react-icons/md";
 import { FaCashRegister } from "react-icons/fa";
 import {jwtDecode} from "jwt-decode";
 import { MdQrCodeScanner } from "react-icons/md";
+import { MdDashboard } from "react-icons/md";
 
 // Import views
 import MainDashboard from "views/admin/default";
 import Profile from "views/admin/profile";
 import SignIn from "views/auth/SignIn";
 import SignUp from "views/auth/SignUp";
+import TeacherSignin from "views/auth/TeacherSignin";
+import TeacherDashboard from "views/teacher/TeacherDashboard";
+import RecordPayment from "views/teacher/RecordPayment";
+import PayDebt from "views/teacher/PayDebt";
+import AccountDash from "views/accountant/AccountDash";
 
 import EntriesTable from "views/admin/tables/components/EntriesTable";
 import StudentList from "views/admin/tables/components/StudentList";
@@ -21,6 +27,7 @@ import CreditTable from "views/admin/tables/components/CreditTable";
 import Permission from "views/admin/tables/components/Permission";
 import TerminalTable from "views/admin/tables/components/TerminalTable";
 import Scanner from "views/admin/tables/components/Scanner";
+import TakePicture from "views/admin/tables/components/TakePicture";
 
 // Import icons
 import {
@@ -28,6 +35,7 @@ import {
   MdPerson,
   MdLock,
   MdListAlt,
+  MdSchool,
 } from "react-icons/md";
 import { FaUserGraduate } from "react-icons/fa";
 
@@ -52,7 +60,8 @@ const getRoleFromToken = () => {
 const role = getRoleFromToken();
 
 const routes = [
-  {
+  // Admin-only routes
+  role === "admin" && {
     name: "Main Dashboard",
     layout: "/admin",
     path: "default",
@@ -63,7 +72,7 @@ const routes = [
       </ProtectedRoute>
     ),
   },
-  {
+  role === "admin" && {
     name: "Student",
     layout: "/admin",
     path: "student",
@@ -74,19 +83,7 @@ const routes = [
       </ProtectedRoute>
     ),
   },
-  // {
-  //   name: "Players",
-  //   layout: "/admin",
-  //   path: "players",
-  //   icon: <FaFutbol  className="h-6 w-6" />, // Football icon
-  //   component: (
-  //     <ProtectedRoute>
-  //       <PlayersTable />
-  //     </ProtectedRoute>
-  //   ),
-  // },
-  
-  {
+  role === "admin" && {
     name: "Daily Collections",
     layout: "/admin",
     path: "entry",
@@ -97,7 +94,7 @@ const routes = [
       </ProtectedRoute>
     ),
   },
-  {
+  role === "admin" && {
     name: "Owing Student",
     layout: "/admin",
     path: "credit",
@@ -108,8 +105,7 @@ const routes = [
       </ProtectedRoute>
     ),
   },
-
-  {
+  role === "admin" && {
     name: "Permission",
     layout: "/admin",
     path: "permission",
@@ -120,7 +116,7 @@ const routes = [
       </ProtectedRoute>
     ),
   },
-
+  // Common routes (visible to both admin and teacher)
   {
     name: "Profile",
     layout: "/admin",
@@ -131,7 +127,7 @@ const routes = [
         <Profile />
       </ProtectedRoute>
     ),
-    hideInSidebar: true, // Hides this route from the sidebar
+    hideInSidebar: true,
   },
   {
     name: "Sign In",
@@ -139,8 +135,7 @@ const routes = [
     path: "sign-in",
     icon: <MdLock className="h-6 w-6" />,
     component: <SignIn />,
-    hideInSidebar: true, // Hides this route from the sidebar
-
+    hideInSidebar: true,
   },
   {
     name: "Sign Up",
@@ -148,9 +143,53 @@ const routes = [
     path: "sign-up",
     icon: <MdLock className="h-6 w-6" />,
     component: <SignUp />,
-    hideInSidebar: true, // Hides this route from the sidebar
-
+    hideInSidebar: true,
   },
+  {
+    name: "Teacher Sign In",
+    layout: "/auth",
+    path: "teacher-sign-in",
+    icon: <MdLock className="h-6 w-6" />,
+    component: <TeacherSignin />,
+    hideInSidebar: true,
+  },
+  // Teacher Dashboard route - visible to both admin and teacher
+  (role === "teacher" || role === "admin") && {
+    name: "Teacher Dashboard",
+    layout: "/admin",
+    path: "teacher-dashboard",
+    icon: <MdSchool className="h-6 w-6" />,
+    component: (
+      <ProtectedRoute>
+        <TeacherDashboard />
+      </ProtectedRoute>
+    ),
+  },
+  // Record Payment route - visible to both admin and teacher
+  (role === "teacher" || role === "admin") && {
+    name: "Record Payment",
+    layout: "/admin",
+    path: "record-payment",
+    icon: <MdAttachMoney className="h-6 w-6" />,
+    component: (
+      <ProtectedRoute>
+        <RecordPayment />
+      </ProtectedRoute>
+    ),
+  },
+  // Pay Debt route - visible to both admin and teacher
+  (role === "teacher" || role === "admin") && {
+    name: "Pay Debt",
+    layout: "/admin",
+    path: "pay-debt",
+    icon: <MdAttachMoney className="h-6 w-6" />,
+    component: (
+      <ProtectedRoute>
+        <PayDebt />
+      </ProtectedRoute>
+    ),
+  },
+  // Admin-only routes
   role === "admin" && {
     name: "Users",
     layout: "/admin",
@@ -181,6 +220,29 @@ const routes = [
     component: (
       <ProtectedRoute>
         <Scanner />
+      </ProtectedRoute>
+    ),
+  },
+  role === "admin" && {
+    name: "Take Picture",
+    layout: "/admin",
+    path: "take-picture",
+    icon: <MdPerson className="h-6 w-6" />,
+    component: (
+      <ProtectedRoute>
+        <TakePicture />
+      </ProtectedRoute>
+    ),
+  },
+  // Accountant Dashboard route - visible to both admin and accountant
+  (role === "accountant" || role === "admin") && {
+    name: "Account Dashboard",
+    layout: "/admin",
+    path: "accountant-dashboard",
+    icon: <MdDashboard className="h-6 w-6" />,
+    component: (
+      <ProtectedRoute>
+        <AccountDash />
       </ProtectedRoute>
     ),
   },

@@ -143,25 +143,106 @@ const StudentList = () => {
   // Download helper function for bulk cards (A4 layout)
   const downloadBulkCards = async (students, containerRef) => {
     try {
+      // Show loading state
+      const loadingButton = document.querySelector('#downloadBulkButton');
+      if (loadingButton) {
+        loadingButton.disabled = true;
+        loadingButton.textContent = 'Generating PDF...';
+      }
+
+      if (!containerRef) {
+        throw new Error('Container reference is missing');
+      }
+
       const element = containerRef;
-      const canvas = await html2canvas(element, {
-        scale: 3,
-        backgroundColor: '#ffffff',
-        logging: false,
-        useCORS: true
+      
+      // Log the element dimensions for debugging
+      console.log('Container dimensions:', {
+        width: element.offsetWidth,
+        height: element.offsetHeight,
+        scrollWidth: element.scrollWidth,
+        scrollHeight: element.scrollHeight
       });
 
-      const imgData = canvas.toDataURL('image/png');
+      // Ensure all images are loaded before generating PDF
+      const images = element.getElementsByTagName('img');
+      await Promise.all(
+        Array.from(images).map(
+          (img) =>
+            new Promise((resolve) => {
+              if (img.complete) {
+                resolve();
+              } else {
+                img.onload = resolve;
+                img.onerror = resolve; // Resolve even on error to continue
+              }
+            })
+        )
+      );
+
+      const canvas = await html2canvas(element, {
+        scale: 1.5, // Further reduced scale for better performance
+        backgroundColor: '#ffffff',
+        logging: true, // Enable logging for debugging
+        useCORS: true,
+        allowTaint: true,
+        imageTimeout: 0, // No timeout for images
+        onclone: (clonedDoc) => {
+          // Log the cloned document for debugging
+          console.log('Cloned document:', clonedDoc);
+        }
+      });
+
+      // Log canvas dimensions
+      console.log('Canvas dimensions:', {
+        width: canvas.width,
+        height: canvas.height
+      });
+
+      const imgData = canvas.toDataURL('image/jpeg', 0.8); // Using JPEG instead of PNG for better performance
+      
+      // Log image data size
+      console.log('Image data size:', imgData.length);
+
       const pdf = new jsPDF({
         orientation: 'portrait',
         unit: 'mm',
-        format: 'a4'
+        format: 'a4',
+        compress: true
       });
 
-      pdf.addImage(imgData, 'PNG', 0, 0, 210, 297);
+      // Calculate dimensions to fit the content properly
+      const imgWidth = 210; // A4 width in mm
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+      
+      // Log PDF dimensions
+      console.log('PDF dimensions:', {
+        width: imgWidth,
+        height: imgHeight
+      });
+
+      pdf.addImage(imgData, 'JPEG', 0, 0, imgWidth, imgHeight);
+      
+      // Save the PDF
       pdf.save('Student_ID_Cards.pdf');
+
+      // Reset button state
+      if (loadingButton) {
+        loadingButton.disabled = false;
+        loadingButton.textContent = 'Download All ID Cards as PDF';
+      }
     } catch (error) {
-      console.error('Error generating PDF:', error);
+      console.error('Detailed error in PDF generation:', error);
+      
+      // Reset button state on error
+      const loadingButton = document.querySelector('#downloadBulkButton');
+      if (loadingButton) {
+        loadingButton.disabled = false;
+        loadingButton.textContent = 'Download All ID Cards as PDF';
+      }
+
+      // Show more detailed error message
+      alert(`Error generating PDF: ${error.message}. Please check the console for more details.`);
     }
   };
 
@@ -257,6 +338,7 @@ const StudentList = () => {
   // Bulk QR Code Modal Component
   const BulkQRCodeModal = ({ students, onClose }) => {
     const containerRef = React.useRef();
+    const [isGenerating, setIsGenerating] = useState(false);
 
     return (
       <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
@@ -283,8 +365,6 @@ const StudentList = () => {
             {students.map((student) => {
               const qrData = `STUDENT:${student.student_id}|${student.student_name}|${student.class}|${student.gender}`;
               
-              console.log('QR Data:', qrData);
-
               return (
                 <div 
                   key={student.student_id}
@@ -348,8 +428,9 @@ const StudentList = () => {
 
           <div className="mt-6 flex justify-center">
             <button
+              id="downloadBulkButton"
               onClick={() => downloadBulkCards(students, containerRef.current)}
-              className="px-6 py-2 bg-navy-700 text-white rounded-lg hover:bg-navy-800"
+              className="px-6 py-2 bg-navy-700 text-white rounded-lg hover:bg-navy-800 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Download All ID Cards as PDF
             </button>

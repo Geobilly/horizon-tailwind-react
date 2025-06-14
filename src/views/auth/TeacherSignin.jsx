@@ -5,82 +5,83 @@ import { FcGoogle } from "react-icons/fc";
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
 import Checkbox from "components/checkbox";
 
-export default function SignIn() {
+export default function TeacherSignin() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false); // Add loading state
+  const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
 
   // Check if the user is already authenticated on page load
   useEffect(() => {
-    const adminLoginDetails = localStorage.getItem("Edupay");
-    if (adminLoginDetails) {
-      navigate("/admin/default"); // Redirect to admin dashboard if already logged in
+    const teacherLoginDetails = localStorage.getItem("Edupay");
+    if (teacherLoginDetails) {
+      navigate("/admin/teacher-dashboard");
     }
   }, [navigate]);
 
   // Function to handle form submission
   const handleLogin = async (e) => {
-    e.preventDefault(); // Prevent form from refreshing the page
-  
-    // Log the email and password for debugging
-    console.log("Email:", email);
-    console.log("Password:", password);
+    e.preventDefault();
   
     if (!email || !password) {
       setError("Both email and password are required.");
       return;
     }
   
-    setLoading(true); // Start loading when the login process begins
+    setLoading(true);
   
     try {
-      const response = await fetch("https://edupaygh-backend.onrender.com/login", {
+      const response = await fetch("https://edupaygh-backend.onrender.com/applogin", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ email, password }), // Send email and password as JSON
+        body: JSON.stringify({ email, password }),
       });
   
+      const data = await response.json();
+  
       if (!response.ok) {
-        const errorData = await response.json();
-        // Set the error message received from the API
-        throw new Error(errorData.error || "An error occurred. Please try again.");
+        throw new Error(data.message || "An error occurred. Please try again.");
       }
+
+      // Store the complete response data in localStorage
+      localStorage.setItem("Edupay", JSON.stringify({
+        token: data.token,
+        user: {
+          name: data.name,
+          email: data.email,
+          role: data.role,
+          classlevel: data.classlevel,
+          contact: data.contact,
+          school_id: data.school_id,
+          school_name: data.school_name
+        }
+      }));
   
-      const data = await response.json(); // Parse the JSON response
-  
-      // Save the API response (token, name, etc.) to localStorage
-      localStorage.setItem("Edupay", JSON.stringify(data));
-  
-      // Reload the page after login
-      window.location.reload(); // Reload the page
+      window.location.reload();
       
-      // Delay navigation to the dashboard after reload
       setTimeout(() => {
-        navigate("/admin/default"); // Navigate to admin dashboard after reload
-      }, 500); // Delay of 500ms to ensure reload happens first
+        navigate("/admin/teacher-dashboard");
+      }, 500);
     } catch (error) {
-      // Set the error message from the catch block
       setError(error.message);
     } finally {
-      setLoading(false); // Stop loading after the request is completed
+      setLoading(false);
     }
   };
-  
 
   return (
     <div className="mt-16 mb-16 flex h-full w-full items-center justify-center px-2 md:mx-0 md:px-0 lg:mb-10 lg:items-center lg:justify-start">
       {/* Sign in section */}
       <div className="mt-[10vh] w-full max-w-full flex-col items-center md:pl-4 lg:pl-0 xl:max-w-[420px]">
         <h4 className="mb-2.5 text-4xl font-bold text-navy-700 dark:text-white">
-          Sign In
+          Teacher Sign In
         </h4>
         <p className="mb-9 ml-1 text-base text-gray-600">
-          Enter your email and password to sign in!
+          Enter your email and password to access your teacher dashboard!
         </p>
         <div className="mb-6 flex h-[50px] w-full items-center justify-center gap-2 rounded-xl bg-lightPrimary hover:cursor-pointer dark:bg-navy-800">
           <div className="rounded-full text-xl">
@@ -100,11 +101,11 @@ export default function SignIn() {
           variant="auth"
           extra="mb-3"
           label="Email*"
-          placeholder="mail@simmmple.com"
+          placeholder="teacher@school.com"
           id="email"
           type="text"
-          value={email} // Bind email state
-          onChange={(e) => setEmail(e.target.value)} // Update email state
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
         />
 
         <InputField
@@ -136,7 +137,7 @@ export default function SignIn() {
           <div className="flex items-center">
             <Checkbox />
             <p className="ml-2 text-sm font-medium text-navy-700 dark:text-white">
-              Keep me logged 
+              Keep me logged in
             </p>
           </div>
           <a
@@ -163,16 +164,16 @@ export default function SignIn() {
         {/* Submit Button */}
         <button
           className="linear mt-2 w-full rounded-xl bg-brand-500 py-[12px] text-base font-medium text-white transition duration-200 hover:bg-brand-600 active:bg-brand-700 dark:bg-brand-400 dark:text-white dark:hover:bg-brand-300 dark:active:bg-brand-200"
-          onClick={handleLogin} // Call the login function
+          onClick={handleLogin}
         >
           Sign In
         </button>
         <div className="mt-4">
-          <span className=" text-sm font-medium text-navy-700 dark:text-gray-600">
+          <span className="text-sm font-medium text-navy-700 dark:text-gray-600">
             Not registered yet?
           </span>
           <a
-            href="/auth/sign-up "
+            href="/auth/teacher-sign-up"
             className="ml-1 text-sm font-medium text-brand-500 hover:text-brand-600 dark:text-white"
           >
             Create an account
@@ -181,4 +182,4 @@ export default function SignIn() {
       </div>
     </div>
   );
-}
+} 

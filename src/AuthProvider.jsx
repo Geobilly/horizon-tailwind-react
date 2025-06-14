@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import Loader from "../src/views/admin/default/components/loader"; // Import the Loader component
 
 const AuthContext = createContext();
@@ -7,6 +7,7 @@ const AuthContext = createContext();
 export const AuthProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(null); // State as null initially for loading
   const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
     // Introduce a delay before checking localStorage to allow data to be stored
@@ -27,14 +28,22 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   useEffect(() => {
-    // Redirect to sign-in page if not authenticated
     if (isAuthenticated === false) {
-      navigate("/auth/sign-in");
-    } else if (isAuthenticated === true && window.location.pathname === "/auth/sign-in") {
-      // If the user is authenticated and on the sign-in page, redirect to /admin/default
-      navigate("/admin/default");
+      // Check if we're on a teacher route
+      if (location.pathname.includes('teacher')) {
+        navigate("/auth/teacher-sign-in");
+      } else {
+        navigate("/auth/sign-in");
+      }
+    } else if (isAuthenticated === true) {
+      // If authenticated and on a sign-in page, redirect to appropriate dashboard
+      if (location.pathname === "/auth/sign-in") {
+        navigate("/admin/default");
+      } else if (location.pathname === "/auth/teacher-sign-in") {
+        navigate("/admin/teacher-dashboard");
+      }
     }
-  }, [isAuthenticated, navigate]);
+  }, [isAuthenticated, navigate, location.pathname]);
 
   return (
     <AuthContext.Provider value={{ isAuthenticated }}>
