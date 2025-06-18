@@ -14,6 +14,7 @@ const TakePicture = ({ onTakePicture }) => {
   const [photoData, setPhotoData] = useState(null);
   const [error, setError] = useState("");
   const [confirmLoading, setConfirmLoading] = useState(false);
+  const [cameraFacingMode, setCameraFacingMode] = useState("user"); // 'user' for front, 'environment' for back
   const videoRef = React.useRef(null);
   const canvasRef = React.useRef(null);
 
@@ -69,7 +70,7 @@ const TakePicture = ({ onTakePicture }) => {
     setError("");
     if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
       navigator.mediaDevices
-        .getUserMedia({ video: true })
+        .getUserMedia({ video: { facingMode: cameraFacingMode } })
         .then((stream) => {
           if (videoRef.current) {
             videoRef.current.srcObject = stream;
@@ -89,6 +90,19 @@ const TakePicture = ({ onTakePicture }) => {
       videoRef.current.srcObject.getTracks().forEach((track) => track.stop());
     }
   };
+
+  const handleSwitchCamera = () => {
+    setCameraFacingMode((prev) => (prev === "user" ? "environment" : "user"));
+  };
+
+  // Restart camera when facing mode changes and camera is open
+  useEffect(() => {
+    if (cameraOpen) {
+      stopCamera();
+      setTimeout(() => startCamera(), 200);
+    }
+    // eslint-disable-next-line
+  }, [cameraFacingMode]);
 
   const handleOpenCamera = (student) => {
     setActiveStudent(student);
@@ -223,6 +237,19 @@ const TakePicture = ({ onTakePicture }) => {
               aria-label="Close"
             >
               <MdClose size={24} />
+            </button>
+            {/* Switch Camera Button */}
+            <button
+              onClick={handleSwitchCamera}
+              className="absolute top-2 left-2 text-blue-500 hover:text-blue-700 dark:text-blue-300 dark:hover:text-blue-100 p-2 rounded-full transition focus:outline-none focus:ring-2 focus:ring-blue-400 bg-blue-100 dark:bg-blue-900 shadow"
+              aria-label="Switch camera"
+              title="Switch camera"
+              type="button"
+            >
+              {/* Camera switch icon (using MdCameraAlt with rotate) */}
+              <span style={{ display: 'inline-block', transform: 'scaleX(-1) rotate(90deg)' }}>
+                <MdCameraAlt size={22} />
+              </span>
             </button>
             <h3 className="text-lg sm:text-xl font-bold text-navy-700 dark:text-white mb-2 sm:mb-4 text-center w-full">
               Take Picture for <span className="text-blue-600 dark:text-blue-400">{activeStudent?.name}</span>
