@@ -328,7 +328,7 @@ const StudentList = () => {
 
               {/* Footer */}
               <div className="absolute bottom-0 left-0 right-0 text-center text-[7px] text-gray-600 p-1 bg-gray-50">
-                This is a property of Kempshot School.
+                Property of Kempshot School.
               </div>
             </div>
 
@@ -437,7 +437,7 @@ const StudentList = () => {
 
                   {/* Footer */}
                   <div className="absolute bottom-0 left-0 right-0 text-center text-[7px] text-gray-600 p-1 bg-gray-50">
-                    Scan QR code to verify student details
+                    Property of Kempshot School.
                   </div>
                 </div>
               );

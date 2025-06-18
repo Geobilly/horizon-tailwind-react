@@ -108,7 +108,7 @@ export const downloadBulkCards = async (students, containerRef) => {
             </div>
           </div>
           <div style='position:absolute;bottom:4px;left:8px;right:8px;text-align:center;font-size:7px;color:#6b7280;padding:2px 0;background:#f9fafb;border-radius:0 0 12px 12px;'>
-            Scan QR code to verify student details
+            Property of Kempshot School.
           </div>
         `;
         grid.appendChild(card);
@@ -411,7 +411,7 @@ export const BulkQRCodeModal = ({ students, onClose }) => {
                     </div>
                   </div>
                   <div style='position:absolute;bottom:4px;left:8px;right:8px;text-align:center;font-size:7px;color:#6b7280;padding:2px 0;background:#f9fafb;border-radius:0 0 12px 12px;'>
-                    Scan QR code to verify student details
+                    Property of Kempshot School.
                   </div>
                 </div>
               );
