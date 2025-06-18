@@ -18,7 +18,7 @@ const DebtPending = ({
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 space-y-4 sm:space-y-0">
           <div>
             <h4 className="text-lg font-bold text-navy-700 dark:text-white">
-              Debt Pending
+              Debt Payment (Pending)
             </h4>
             <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
               Total: GH₵ {transactions.reduce((sum, t) => sum + t.amount, 0).toFixed(2)}

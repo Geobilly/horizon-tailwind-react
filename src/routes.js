@@ -223,7 +223,7 @@ const routes = [
       </ProtectedRoute>
     ),
   },
-  role === "admin" && {
+  (role === "admin" || role === "teacher") && {
     name: "Take Picture",
     layout: "/admin",
     path: "take-picture",

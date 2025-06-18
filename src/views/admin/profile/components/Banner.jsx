@@ -97,8 +97,18 @@ const Banner = () => {
         className="relative mt-1 flex h-32 w-full justify-center rounded-xl bg-cover"
         style={{ backgroundImage: `url(${banner})` }}
       >
-        <div className="absolute -bottom-12 flex h-[87px] w-[87px] items-center justify-center rounded-full border-[4px] border-white bg-pink-400 dark:!border-navy-700">
-          {/* Removed img tag, keeping the circular container */}
+        <div className="absolute -bottom-12 flex h-[87px] w-[87px] items-center justify-center rounded-full border-[4px] border-white bg-pink-400 dark:!border-navy-700 overflow-hidden">
+          {studentData?.image_data ? (
+            <img
+              src={`data:image/png;base64,${studentData.image_data}`}
+              alt="Student Avatar"
+              className="w-full h-full object-cover rounded-full"
+            />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center text-white text-3xl font-bold bg-pink-400 rounded-full">
+              {/* Optionally, show initials or fallback icon */}
+            </div>
+          )}
         </div>
       </div>
 

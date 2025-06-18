@@ -280,9 +280,18 @@ const StudentList = () => {
               <div className="flex p-3">
                 {/* Photo Section */}
                 <div className="w-[25mm] mr-3">
-                  <div className="w-full h-[30mm] border border-dashed border-navy-700 flex items-center justify-center bg-gray-50">
-                    <span className="text-[8px] text-gray-500">Photo</span>
-                  </div>
+                  {student.image_data ? (
+                    <img
+                      src={`data:image/png;base64,${student.image_data}`}
+                      alt="Student"
+                      className="w-full h-[30mm] object-cover rounded-lg border border-gray-200 dark:border-navy-700"
+                      style={{ maxHeight: '30mm', maxWidth: '25mm' }}
+                    />
+                  ) : (
+                    <div className="w-full h-[30mm] border border-dashed border-navy-700 flex items-center justify-center bg-gray-50 rounded-lg">
+                      <span className="text-[8px] text-gray-500">Photo</span>
+                    </div>
+                  )}
                 </div>
 
                 {/* Details Section */}
@@ -319,7 +328,7 @@ const StudentList = () => {
 
               {/* Footer */}
               <div className="absolute bottom-0 left-0 right-0 text-center text-[7px] text-gray-600 p-1 bg-gray-50">
-                Scan QR code to verify student details
+                This is a property of Kempshot School.
               </div>
             </div>
 
@@ -380,9 +389,18 @@ const StudentList = () => {
                   <div className="flex p-3">
                     {/* Photo Section */}
                     <div className="w-[25mm] mr-3">
-                      <div className="w-full h-[30mm] border border-dashed border-navy-700 flex items-center justify-center bg-gray-50">
-                        <span className="text-[8px] text-gray-500">Photo</span>
-                      </div>
+                      {student.image_data ? (
+                        <img
+                          src={`data:image/png;base64,${student.image_data}`}
+                          alt="Student"
+                          className="w-full h-[30mm] object-cover rounded-lg border border-gray-200 dark:border-navy-700"
+                          style={{ maxHeight: '30mm', maxWidth: '25mm' }}
+                        />
+                      ) : (
+                        <div className="w-full h-[30mm] border border-dashed border-navy-700 flex items-center justify-center bg-gray-50 rounded-lg">
+                          <span className="text-[8px] text-gray-500">Photo</span>
+                        </div>
+                      )}
                     </div>
 
                     {/* Details Section */}
@@ -442,6 +460,26 @@ const StudentList = () => {
 
   const columns = useMemo(
     () => [
+      {
+        Header: "IMAGE",
+        accessor: "image_data",
+        Cell: ({ row }) => {
+          const imageData = row.original.image_data;
+          return imageData ? (
+            <img
+              src={`data:image/png;base64,${imageData}`}
+              alt="Student"
+              className="w-10 h-10 rounded-full object-cover border border-gray-200 dark:border-navy-700 shadow-sm"
+            />
+          ) : (
+            <div className="w-10 h-10 rounded-full bg-gray-200 dark:bg-navy-700 flex items-center justify-center text-gray-400 text-xl">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="w-6 h-6">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5.121 17.804A13.937 13.937 0 0112 15c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0z" />
+              </svg>
+            </div>
+          );
+        },
+      },
       {
         Header: () => {
           // Determine if all students are selected
