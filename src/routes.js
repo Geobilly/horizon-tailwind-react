@@ -60,8 +60,8 @@ const getRoleFromToken = () => {
 const role = getRoleFromToken();
 
 const routes = [
-  // Admin-only routes
-  role === "admin" && {
+  // Admin and Accountant can see these
+  (role === "admin" || role === "accountant") && {
     name: "Main Dashboard",
     layout: "/admin",
     path: "default",
@@ -72,7 +72,7 @@ const routes = [
       </ProtectedRoute>
     ),
   },
-  role === "admin" && {
+  (role === "admin" || role === "accountant") && {
     name: "Student",
     layout: "/admin",
     path: "student",
@@ -83,7 +83,7 @@ const routes = [
       </ProtectedRoute>
     ),
   },
-  role === "admin" && {
+  (role === "admin" || role === "accountant") && {
     name: "Daily Collections",
     layout: "/admin",
     path: "entry",
@@ -94,7 +94,7 @@ const routes = [
       </ProtectedRoute>
     ),
   },
-  role === "admin" && {
+  (role === "admin" || role === "accountant") && {
     name: "Owing Student",
     layout: "/admin",
     path: "credit",
@@ -105,7 +105,7 @@ const routes = [
       </ProtectedRoute>
     ),
   },
-  role === "admin" && {
+  (role === "admin" || role === "accountant") && {
     name: "Permission",
     layout: "/admin",
     path: "permission",
@@ -189,7 +189,7 @@ const routes = [
       </ProtectedRoute>
     ),
   },
-  // Admin-only routes
+  // Admin only (accountant should NOT see these)
   role === "admin" && {
     name: "Users",
     layout: "/admin",
