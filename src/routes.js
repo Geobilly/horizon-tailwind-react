@@ -19,6 +19,8 @@ import TeacherDashboard from "views/teacher/TeacherDashboard";
 import RecordPayment from "views/teacher/RecordPayment";
 import PayDebt from "views/teacher/PayDebt";
 import AccountDash from "views/accountant/AccountDash";
+import AgentsPage from "views/agents/AgentsPage";
+import AddCustomerPage from "views/agents/AddCustomerPage";
 
 import EntriesTable from "views/admin/tables/components/EntriesTable";
 import StudentList from "views/admin/tables/components/StudentList";
@@ -37,7 +39,7 @@ import {
   MdListAlt,
   MdSchool,
 } from "react-icons/md";
-import { FaUserGraduate } from "react-icons/fa";
+import { FaUserGraduate, FaUsers } from "react-icons/fa";
 
 // Import ProtectedRoute
 import ProtectedRoute from "./ProtectedRoute";
@@ -82,6 +84,25 @@ const routes = [
         <StudentList />
       </ProtectedRoute>
     ),
+  },
+  (role === "admin" || role === "accountant") && {
+    name: "Agents",
+    layout: "/admin",
+    path: "agents",
+    icon: <FaUsers className="h-6 w-6" />,
+    component: (
+      <ProtectedRoute>
+        <AgentsPage />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    name: "Add Customer",
+    layout: "/empty",
+    path: "agents/:agentId/add-customer",
+    icon: <FaUsers className="h-6 w-6" />,
+    component: <AddCustomerPage />,
+    hideInSidebar: true,
   },
   (role === "admin" || role === "accountant") && {
     name: "Daily Collections",

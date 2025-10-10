@@ -29,6 +29,11 @@ export const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     if (isAuthenticated === false) {
+      // Skip authentication check for public routes (empty layout)
+      if (location.pathname.includes('/empty/')) {
+        return; // Allow access to empty layout routes without authentication
+      }
+      
       // Check if we're on a teacher route
       if (location.pathname.includes('teacher')) {
         navigate("/auth/teacher-sign-in");

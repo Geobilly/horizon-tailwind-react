@@ -1,0 +1,315 @@
+import React, { useState } from "react";
+import Card from "components/card";
+import { FaTimes, FaUser, FaPhone, FaMapMarkerAlt, FaGraduationCap } from "react-icons/fa";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
+
+const AddCustomerPage = () => {
+  const { agentId } = useParams();
+  const navigate = useNavigate();
+  const location = useLocation();
+  
+  // Agent data - same as in AgentsPage
+  const agentsData = [
+    {
+      id: 1,
+      name: "Kwame Asante",
+      location: "Accra",
+      contact: "+233 24 123 4567",
+      customers: 45,
+      dateCreated: "2024-01-15"
+    },
+    {
+      id: 2,
+      name: "Ama Osei", 
+      location: "Kumasi",
+      contact: "+233 20 234 5678",
+      customers: 38,
+      dateCreated: "2024-02-03"
+    },
+    {
+      id: 3,
+      name: "Kofi Mensah",
+      location: "Tamale", 
+      contact: "+233 26 345 6789",
+      customers: 52,
+      dateCreated: "2024-01-28"
+    },
+    {
+      id: 4,
+      name: "Akosua Boateng",
+      location: "Cape Coast",
+      contact: "+233 24 456 7890",
+      customers: 29,
+      dateCreated: "2024-03-10"
+    },
+    {
+      id: 5,
+      name: "Yaw Appiah",
+      location: "Takoradi",
+      contact: "+233 20 567 8901",
+      customers: 41,
+      dateCreated: "2024-02-18"
+    }
+  ];
+  
+  // Get agent data from navigation state or fallback to agentsData
+  const agentFromState = location.state;
+  const agentFromData = agentsData.find(agent => agent.id === parseInt(agentId));
+  
+  const agent = agentFromState || {
+    agentId: agentFromData?.id || agentId,
+    agentName: agentFromData?.name || "Unknown Agent",
+    agentLocation: agentFromData?.location || "Unknown"
+  };
+
+  const [formData, setFormData] = useState({
+    name: "",
+    level: "",
+    contact: "",
+    location: "",
+    school: "Kempshot Grammar Academy"
+  });
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    // Handle form submission here
+    console.log("Customer data:", formData);
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    navigate('/admin/agents');
+  };
+
+  const handleBack = () => {
+    navigate('/admin/agents');
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+      {/* Header */}
+      <div className="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-16">
+            <div className="flex items-center space-x-6">
+              <div className="text-sm">
+                <span className="text-gray-500 dark:text-gray-400">Agent ID:</span>
+                <span className="ml-2 font-medium text-gray-900 dark:text-white">{agent.agentId || agentId}</span>
+              </div>
+              <div className="text-sm">
+                <span className="text-gray-500 dark:text-gray-400">Agent Name:</span>
+                <span className="ml-2 font-medium text-gray-900 dark:text-white">{agent.agentName}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Main Content */}
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* School Selection Header */}
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-6 text-center">
+            Add New Customer
+          </h1>
+          
+          {/* School Selection */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+            <Card extra="p-6 cursor-pointer transition-all duration-200 hover:shadow-lg">
+              <div 
+                className={`text-center p-4 rounded-lg border-2 transition-colors ${
+                  formData.school === "Kempshot Grammar Academy" 
+                    ? "border-blue-500 bg-blue-50 dark:bg-blue-900/20" 
+                    : "border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600"
+                }`}
+                onClick={() => setFormData(prev => ({ ...prev, school: "Kempshot Grammar Academy" }))}
+              >
+                <FaGraduationCap className="w-12 h-12 mx-auto mb-3 text-blue-600 dark:text-blue-400" />
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+                  Kempshot Grammar Academy
+                </h3>
+                <p className="text-sm text-gray-600 dark:text-gray-400">
+                  Secondary Education
+                </p>
+              </div>
+            </Card>
+
+            <Card extra="p-6 cursor-pointer transition-all duration-200 hover:shadow-lg">
+              <div 
+                className={`text-center p-4 rounded-lg border-2 transition-colors ${
+                  formData.school === "Kempshot Business College" 
+                    ? "border-green-500 bg-green-50 dark:bg-green-900/20" 
+                    : "border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600"
+                }`}
+                onClick={() => setFormData(prev => ({ ...prev, school: "Kempshot Business College" }))}
+              >
+                <FaGraduationCap className="w-12 h-12 mx-auto mb-3 text-green-600 dark:text-green-400" />
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+                  Kempshot Business College
+                </h3>
+                <p className="text-sm text-gray-600 dark:text-gray-400">
+                  Tertiary Education
+                </p>
+              </div>
+            </Card>
+          </div>
+        </div>
+
+        {/* Customer Form */}
+        <Card extra="p-8">
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Full Name */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  <FaUser className="inline w-4 h-4 mr-2" />
+                  Full Name
+                </label>
+                <input
+                  type="text"
+                  name="name"
+                  value={formData.name}
+                  onChange={handleInputChange}
+                  required
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                  placeholder="Enter customer's full name"
+                />
+              </div>
+
+              {/* Level */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  <FaGraduationCap className="inline w-4 h-4 mr-2" />
+                  Level
+                </label>
+                <select
+                  name="level"
+                  value={formData.level}
+                  onChange={handleInputChange}
+                  required
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                >
+                  <option value="">Select level</option>
+                  {formData.school === "Kempshot Grammar Academy" ? (
+                    <>
+                      <option value="Nursery">Nursery</option>
+                      <option value="Nursery 2">Nursery 2</option>
+                      <option value="KG 1">KG 1</option>
+                      <option value="KG 2">KG 2</option>
+                      <option value="Class 1">Class 1</option>
+                      <option value="Class 2">Class 2</option>
+                      <option value="Class 3">Class 3</option>
+                      <option value="Class 4">Class 4</option>
+                      <option value="Class 5">Class 5</option>
+                      <option value="Class 6">Class 6</option>
+                      <option value="JHS 1">JHS 1</option>
+                      <option value="JHS 2">JHS 2</option>
+                      <option value="JHS 3">JHS 3</option>
+                    </>
+                  ) : (
+                    <>
+                      <option value="SHS 1">SHS 1</option>
+                      <option value="SHS 2">SHS 2</option>
+                      <option value="SHS 3">SHS 3</option>
+                    </>
+                  )}
+                </select>
+              </div>
+
+              {/* Phone Number */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  <FaPhone className="inline w-4 h-4 mr-2" />
+                  Phone Number
+                </label>
+                <input
+                  type="tel"
+                  name="contact"
+                  value={formData.contact}
+                  onChange={handleInputChange}
+                  required
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                  placeholder="+233 XX XXX XXXX"
+                />
+              </div>
+
+              {/* Location */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  <FaMapMarkerAlt className="inline w-4 h-4 mr-2" />
+                  Location
+                </label>
+                <select
+                  name="location"
+                  value={formData.location}
+                  onChange={handleInputChange}
+                  required
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                >
+                  <option value="">Select location</option>
+                  <option value="Accra">Accra</option>
+                  <option value="Kumasi">Kumasi</option>
+                  <option value="Tamale">Tamale</option>
+                  <option value="Cape Coast">Cape Coast</option>
+                  <option value="Takoradi">Takoradi</option>
+                </select>
+              </div>
+
+            </div>
+
+            {/* Submit Button */}
+            <div className="flex justify-center pt-6">
+              <button
+                type="submit"
+                className="px-8 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium text-lg"
+              >
+                Add Customer
+              </button>
+            </div>
+          </form>
+        </Card>
+      </div>
+
+      {/* Success Modal */}
+      {isModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <div className="absolute inset-0 bg-black bg-opacity-50 backdrop-blur-sm" onClick={handleCloseModal} />
+          <div className="relative bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full mx-4 p-6">
+            <div className="text-center">
+              <div className="w-16 h-16 bg-green-100 dark:bg-green-900/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg className="w-8 h-8 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+              </div>
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+                Customer Added Successfully!
+              </h3>
+              <p className="text-gray-600 dark:text-gray-400 mb-6">
+                The customer has been added to {agent.agentName}'s list.
+              </p>
+              <button
+                onClick={handleCloseModal}
+                className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              >
+                Continue
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default AddCustomerPage;
