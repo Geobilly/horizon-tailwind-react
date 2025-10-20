@@ -16,59 +16,12 @@ const AddCustomerPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
   
-  // Agent data - same as in AgentsPage
-  const agentsData = [
-    {
-      id: 1,
-      name: "Kwame Asante",
-      location: "Accra",
-      contact: "+233 24 123 4567",
-      customers: 45,
-      dateCreated: "2024-01-15"
-    },
-    {
-      id: 2,
-      name: "Ama Osei", 
-      location: "Kumasi",
-      contact: "+233 20 234 5678",
-      customers: 38,
-      dateCreated: "2024-02-03"
-    },
-    {
-      id: 3,
-      name: "Kofi Mensah",
-      location: "Tamale", 
-      contact: "+233 26 345 6789",
-      customers: 52,
-      dateCreated: "2024-01-28"
-    },
-    {
-      id: 4,
-      name: "Akosua Boateng",
-      location: "Cape Coast",
-      contact: "+233 24 456 7890",
-      customers: 29,
-      dateCreated: "2024-03-10"
-    },
-    {
-      id: 5,
-      name: "Yaw Appiah",
-      location: "Takoradi",
-      contact: "+233 20 567 8901",
-      customers: 41,
-      dateCreated: "2024-02-18"
-    }
-  ];
-  
-  // Get agent data from navigation state or fallback to agentsData
-  const agentFromState = location.state;
-  const agentFromData = agentsData.find(agent => agent.id === parseInt(agentId));
-  
-  const agent = agentFromState || {
-    agentId: agentFromData?.id || agentId,
-    agentName: agentFromData?.name || "Unknown Agent",
-    agentLocation: agentFromData?.location || "Unknown"
-  };
+  const [agent, setAgent] = useState({
+    agentId: agentId,
+    agentName: "Loading...",
+    agentLocation: "Loading..."
+  });
+  const [agentLoading, setAgentLoading] = useState(true);
 
   const [formData, setFormData] = useState({
     name: "",
@@ -83,6 +36,58 @@ const AddCustomerPage = () => {
   const [loading, setLoading] = useState(false);
   const [showPayment, setShowPayment] = useState(false);
   const [pendingCustomerData, setPendingCustomerData] = useState(null);
+
+  // Fetch agent data on component mount
+  React.useEffect(() => {
+    const fetchAgentData = async () => {
+      // Check if agent data was passed via navigation state (from button click)
+      if (location.state) {
+        setAgent({
+          agentId: location.state.agentId,
+          agentName: location.state.agentName,
+          agentLocation: location.state.agentLocation
+        });
+        setAgentLoading(false);
+        return;
+      }
+
+      // Otherwise fetch from API (for QR code scans)
+      try {
+        const response = await axios.get(`${API_BASE_URL}/fetchagents`);
+        
+        if (response.data && response.data.agents) {
+          const agentData = response.data.agents.find(a => a.id === parseInt(agentId));
+          
+          if (agentData) {
+            setAgent({
+              agentId: agentData.id,
+              agentName: agentData.name,
+              agentLocation: agentData.location
+            });
+          } else {
+            setAgent({
+              agentId: agentId,
+              agentName: "Unknown Agent",
+              agentLocation: "Unknown"
+            });
+            toast.warning("Agent not found");
+          }
+        }
+      } catch (error) {
+        console.error("Error fetching agent data:", error);
+        toast.error("Failed to load agent information");
+        setAgent({
+          agentId: agentId,
+          agentName: "Unknown Agent",
+          agentLocation: "Unknown"
+        });
+      } finally {
+        setAgentLoading(false);
+      }
+    };
+
+    fetchAgentData();
+  }, [agentId, location.state]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -184,7 +189,7 @@ const AddCustomerPage = () => {
       />
 
       {/* Loader */}
-      {loading && (
+      {(loading || agentLoading) && (
         <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-[1000] backdrop-blur-md">
           <CircularWithValueLabel size={80} color="#36d7b7" />
         </div>
