@@ -1,103 +1,18 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import Card from "components/card";
 import Widget from "components/widget/Widget";
 import { FaUsers, FaUser, FaDollarSign, FaTimes } from "react-icons/fa";
 import { MdSearch, MdDownload, MdCalendarToday } from "react-icons/md";
 import { useTable, useGlobalFilter, usePagination, useSortBy } from "react-table";
 import { useNavigate } from "react-router-dom";
+import QRCodeGenerator from "components/QRCodeGenerator";
+import axios from "axios";
+import CircularWithValueLabel from "components/loader/index";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
-// Sample data for agents
-const agentsData = [
-  {
-    id: 1,
-    name: "Kwame Asante",
-    location: "Accra",
-    contact: "+233 24 123 4567",
-    customers: 45,
-    dateCreated: "2024-01-15"
-  },
-  {
-    id: 2,
-    name: "Ama Osei", 
-    location: "Kumasi",
-    contact: "+233 20 234 5678",
-    customers: 38,
-    dateCreated: "2024-02-03"
-  },
-  {
-    id: 3,
-    name: "Kofi Mensah",
-    location: "Tamale", 
-    contact: "+233 26 345 6789",
-    customers: 52,
-    dateCreated: "2024-01-28"
-  },
-  {
-    id: 4,
-    name: "Akosua Boateng",
-    location: "Cape Coast",
-    contact: "+233 24 456 7890",
-    customers: 29,
-    dateCreated: "2024-03-10"
-  },
-  {
-    id: 5,
-    name: "Yaw Appiah",
-    location: "Takoradi",
-    contact: "+233 20 567 8901",
-    customers: 41,
-    dateCreated: "2024-02-18"
-  }
-];
-
-// Sample data for customers
-const customersData = [
-  {
-    id: 1,
-    name: "Adwoa Serwaa",
-    level: "SHS 3",
-    contact: "+233 24 678 9012",
-    location: "Accra",
-    payment: "₵1,200",
-    dateCreated: "2024-01-20"
-  },
-  {
-    id: 2,
-    name: "Kojo Nkrumah",
-    level: "SHS 2", 
-    contact: "+233 20 789 0123",
-    location: "Kumasi",
-    payment: "₵800",
-    dateCreated: "2024-02-05"
-  },
-  {
-    id: 3,
-    name: "Efua Adjei",
-    level: "SHS 1",
-    contact: "+233 26 890 1234", 
-    location: "Tamale",
-    payment: "₵500",
-    dateCreated: "2024-03-01"
-  },
-  {
-    id: 4,
-    name: "Kwabena Owusu",
-    level: "SHS 3",
-    contact: "+233 24 901 2345",
-    location: "Cape Coast", 
-    payment: "₵1,100",
-    dateCreated: "2024-01-30"
-  },
-  {
-    id: 5,
-    name: "Abena Konadu",
-    level: "SHS 2",
-    contact: "+233 20 012 3456",
-    location: "Takoradi",
-    payment: "₵750",
-    dateCreated: "2024-02-22"
-  }
-];
+// API base URL
+const API_BASE_URL = "https://edupaygh-backend.onrender.com";
 
 // Table columns for agents
 const AgentsColumns = () => {
@@ -141,27 +56,38 @@ const AgentsColumns = () => {
     {
       Header: "ACTIONS",
       accessor: "actions",
-      Cell: ({ row }) => (
-        <div className="flex gap-2">
-          <button className="flex items-center gap-1 px-3 py-1 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium">
-            <span>📱</span>
-            Print QR Code
-          </button>
-          <button 
-            onClick={() => navigate(`/empty/agents/${row.original.id}/add-customer`, {
-              state: {
-                agentId: row.original.id,
-                agentName: row.original.name,
-                agentLocation: row.original.location
-              }
-            })}
-            className="flex items-center gap-1 px-3 py-1 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm font-medium"
-          >
-            <span>+</span>
-            Add Customer
-          </button>
-        </div>
-      ),
+      Cell: ({ row }) => {
+        const { generateAndDownloadQR } = QRCodeGenerator({
+          agentId: row.original.id,
+          agentName: row.original.name,
+          agentLocation: row.original.location
+        });
+
+        return (
+          <div className="flex gap-2">
+            <button 
+              onClick={generateAndDownloadQR}
+              className="flex items-center gap-1 px-3 py-1 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
+            >
+              <span>📱</span>
+              Print QR Code
+            </button>
+            <button 
+              onClick={() => navigate(`/empty/agents/${row.original.id}/add-customer`, {
+                state: {
+                  agentId: row.original.id,
+                  agentName: row.original.name,
+                  agentLocation: row.original.location
+                }
+              })}
+              className="flex items-center gap-1 px-3 py-1 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm font-medium"
+            >
+              <span>+</span>
+              Add Customer
+            </button>
+          </div>
+        );
+      },
     },
   ];
 };
@@ -175,6 +101,24 @@ const customersColumns = [
   {
     Header: "NAME",
     accessor: "name",
+  },
+  {
+    Header: "AGENT ID",
+    accessor: "agentId",
+    Cell: ({ value }) => (
+      <span className="px-2 py-1 bg-purple-100 text-purple-800 rounded-full text-xs font-medium">
+        {value}
+      </span>
+    ),
+  },
+  {
+    Header: "AGENT NAME",
+    accessor: "agentName",
+    Cell: ({ value }) => (
+      <span className="font-medium text-gray-900 dark:text-white">
+        {value}
+      </span>
+    ),
   },
   {
     Header: "LEVEL",
@@ -220,6 +164,7 @@ const AddAgentModal = ({ isOpen, onClose, onAddAgent }) => {
     location: "",
     contact: ""
   });
+  const [loading, setLoading] = useState(false);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -229,17 +174,46 @@ const AddAgentModal = ({ isOpen, onClose, onAddAgent }) => {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    const newAgent = {
-      id: Date.now(), // Simple ID generation
-      ...formData,
-      customers: 0, // Default to 0 for new agents
-      dateCreated: new Date().toISOString().split('T')[0]
+    setLoading(true);
+
+    const agentData = {
+      name: formData.name,
+      location: formData.location,
+      contact: formData.contact
     };
-    onAddAgent(newAgent);
-    setFormData({ name: "", location: "", contact: "" });
-    onClose();
+
+    try {
+      const response = await axios.post(`${API_BASE_URL}/addagent`, agentData);
+      
+      if (response.data && response.data.agent) {
+        const newAgent = {
+          id: response.data.agent.id,
+          name: response.data.agent.name,
+          location: response.data.agent.location,
+          contact: response.data.agent.contact,
+          customers: 0,
+          dateCreated: new Date().toISOString().split('T')[0]
+        };
+        
+        onAddAgent(newAgent);
+        toast.success(response.data.message || "Agent added successfully!");
+        setFormData({ name: "", location: "", contact: "" });
+        onClose();
+      }
+    } catch (error) {
+      console.error("Error adding agent:", error);
+      if (error.response && error.response.data && error.response.data.error) {
+        toast.error(`Error: ${error.response.data.error}`);
+      } else if (error.message === "Network Error") {
+        toast.error("Network Error: Unable to connect to the server. Please check if the server is running.");
+      } else {
+        toast.error("There was an error adding the agent. Please try again.");
+      }
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleClose = () => {
@@ -251,6 +225,13 @@ const AddAgentModal = ({ isOpen, onClose, onAddAgent }) => {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
+      {/* Loader */}
+      {loading && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-[1000] backdrop-blur-md">
+          <CircularWithValueLabel size={80} color="#36d7b7" />
+        </div>
+      )}
+
       {/* Blurred Background */}
       <div 
         className="absolute inset-0 bg-black bg-opacity-50 backdrop-blur-sm"
@@ -519,7 +500,75 @@ const DataTable = ({ columns, data, title, searchPlaceholder, showAddButton = fa
 };
 
 const AgentsPage = () => {
-  const [agents, setAgents] = useState(agentsData);
+  const [agents, setAgents] = useState([]);
+  const [customers, setCustomers] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  // Fetch agents and customers on component mount
+  useEffect(() => {
+    fetchAgents();
+    fetchCustomers();
+  }, []);
+
+  const fetchAgents = async () => {
+    setLoading(true);
+    try {
+      const response = await axios.get(`${API_BASE_URL}/fetchagents`);
+      
+      if (response.data && response.data.agents) {
+        // Transform API data to match our table format
+        const transformedAgents = response.data.agents.map(agent => ({
+          id: agent.id,
+          name: agent.name,
+          location: agent.location,
+          contact: agent.contact,
+          customers: agent.customers || 0, // Use actual customer count from API
+          dateCreated: new Date(agent.date_created).toISOString().split('T')[0]
+        }));
+        
+        setAgents(transformedAgents);
+      }
+    } catch (error) {
+      console.error("Error fetching agents:", error);
+      if (error.message === "Network Error") {
+        toast.error("Unable to connect to the server. Please check if the server is running.");
+      } else {
+        toast.error("Failed to fetch agents. Please try again.");
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchCustomers = async () => {
+    try {
+      const response = await axios.get(`${API_BASE_URL}/fetchcustomers`);
+      
+      if (response.data && response.data.customers) {
+        // Transform API data to match our table format
+        const transformedCustomers = response.data.customers.map(customer => ({
+          id: customer.id,
+          name: customer.name,
+          agentId: customer.agent_id,
+          agentName: customer.agent_name,
+          level: customer.level,
+          contact: customer.contact,
+          location: customer.location,
+          payment: `₵${customer.payment.toFixed(2)}`,
+          dateCreated: new Date(customer.date_created).toISOString().split('T')[0]
+        }));
+        
+        setCustomers(transformedCustomers);
+      }
+    } catch (error) {
+      console.error("Error fetching customers:", error);
+      if (error.message === "Network Error") {
+        toast.error("Unable to connect to the server. Please check if the server is running.");
+      } else {
+        toast.error("Failed to fetch customers. Please try again.");
+      }
+    }
+  };
 
   const handleAddAgent = (newAgent) => {
     setAgents(prevAgents => [...prevAgents, newAgent]);
@@ -527,6 +576,27 @@ const AgentsPage = () => {
 
   return (
     <div className="p-6">
+      {/* Toast Container */}
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+      />
+
+      {/* Loading Overlay */}
+      {loading && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-[1000] backdrop-blur-md">
+          <CircularWithValueLabel size={80} color="#36d7b7" />
+        </div>
+      )}
+
       {/* KPI Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         <Widget
@@ -537,12 +607,15 @@ const AgentsPage = () => {
         <Widget
           icon={<FaUser className="h-7 w-7" />}
           title="Total Customers"
-          subtitle="5,450"
+          subtitle={customers.length.toString()}
         />
         <Widget
           icon={<FaDollarSign className="h-7 w-7" />}
           title="Total Income"
-          subtitle="₵250,000"
+          subtitle={`₵${customers.reduce((sum, customer) => {
+            const payment = parseFloat(customer.payment.replace('₵', '').replace(',', '')) || 0;
+            return sum + payment;
+          }, 0).toFixed(2)}`}
         />
       </div>
 
@@ -558,7 +631,7 @@ const AgentsPage = () => {
         />
         <DataTable
           columns={customersColumns}
-          data={customersData}
+          data={customers}
           title="Customers Summary"
           searchPlaceholder="Search customers"
         />

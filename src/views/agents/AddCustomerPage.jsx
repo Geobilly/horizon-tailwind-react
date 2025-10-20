@@ -2,6 +2,14 @@ import React, { useState } from "react";
 import Card from "components/card";
 import { FaTimes, FaUser, FaPhone, FaMapMarkerAlt, FaGraduationCap } from "react-icons/fa";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
+import axios from "axios";
+import CircularWithValueLabel from "components/loader/index";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import PaystackPayment from "components/payment/PaystackPayment";
+
+// API base URL
+const API_BASE_URL = "https://edupaygh-backend.onrender.com";
 
 const AddCustomerPage = () => {
   const { agentId } = useParams();
@@ -64,6 +72,7 @@ const AddCustomerPage = () => {
 
   const [formData, setFormData] = useState({
     name: "",
+    email: "",
     level: "",
     contact: "",
     location: "",
@@ -71,6 +80,9 @@ const AddCustomerPage = () => {
   });
 
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [showPayment, setShowPayment] = useState(false);
+  const [pendingCustomerData, setPendingCustomerData] = useState(null);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -82,9 +94,68 @@ const AddCustomerPage = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Handle form submission here
-    console.log("Customer data:", formData);
-    setIsModalOpen(true);
+    
+    // Validate form and prepare customer data
+    const customerData = {
+      name: formData.name,
+      email: formData.email,
+      agent_id: parseInt(agent.agentId || agentId),
+      level: formData.level,
+      contact: formData.contact,
+      location: formData.location,
+      payment: 5.00 // Registration fee
+    };
+
+    // Store customer data and show payment modal
+    setPendingCustomerData(customerData);
+    setShowPayment(true);
+  };
+
+  const handlePaymentSuccess = async (reference) => {
+    setShowPayment(false);
+    setLoading(true);
+
+    // Add payment reference to customer data
+    const customerDataWithPayment = {
+      ...pendingCustomerData,
+      payment_reference: reference.reference,
+      payment_status: "paid"
+    };
+
+    try {
+      const response = await axios.post(`${API_BASE_URL}/addcustomer`, customerDataWithPayment);
+      
+      if (response.data && response.data.customer) {
+        toast.success("Payment successful! Customer added successfully!");
+        setIsModalOpen(true);
+        // Reset form
+        setFormData({
+          name: "",
+          email: "",
+          level: "",
+          contact: "",
+          location: "",
+          school: "Kempshot Grammar Academy"
+        });
+        setPendingCustomerData(null);
+      }
+    } catch (error) {
+      console.error("Error adding customer:", error);
+      if (error.response && error.response.data && error.response.data.error) {
+        toast.error(`Error: ${error.response.data.error}`);
+      } else if (error.message === "Network Error") {
+        toast.error("Network Error: Unable to connect to the server. Please check if the server is running.");
+      } else {
+        toast.error("There was an error adding the customer. Please try again.");
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handlePaymentClose = () => {
+    setShowPayment(false);
+    toast.info("Payment cancelled. Please complete payment to add customer.");
   };
 
   const handleCloseModal = () => {
@@ -98,6 +169,27 @@ const AddCustomerPage = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+      {/* Toast Container */}
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+      />
+
+      {/* Loader */}
+      {loading && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-[1000] backdrop-blur-md">
+          <CircularWithValueLabel size={80} color="#36d7b7" />
+        </div>
+      )}
+
       {/* Header */}
       <div className="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -227,6 +319,23 @@ const AddCustomerPage = () => {
                 </select>
               </div>
 
+              {/* Email Address */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  <FaUser className="inline w-4 h-4 mr-2" />
+                  Email Address
+                </label>
+                <input
+                  type="email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleInputChange}
+                  required
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                  placeholder="customer@example.com"
+                />
+              </div>
+
               {/* Phone Number */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -269,17 +378,33 @@ const AddCustomerPage = () => {
             </div>
 
             {/* Submit Button */}
-            <div className="flex justify-center pt-6">
+            <div className="flex flex-col items-center pt-6">
               <button
                 type="submit"
-                className="px-8 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium text-lg"
+                disabled={loading}
+                className="px-8 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium text-lg disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                Add Customer
+                {loading ? "Processing..." : "Proceed to Payment (GHS 0.01)"}
               </button>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
+                  Test Mode: Registration fee of GHS 0.01 (1 pesewa)
+                </p>
             </div>
           </form>
         </Card>
       </div>
+
+      {/* Payment Modal */}
+      {showPayment && pendingCustomerData && (
+        <PaystackPayment
+          email={formData.email}
+          name={formData.name}
+          phone={formData.contact}
+          amount={1} // GHS 0.01 (1 pesewa) - FOR TESTING
+          onSuccess={handlePaymentSuccess}
+          onClose={handlePaymentClose}
+        />
+      )}
 
       {/* Success Modal */}
       {isModalOpen && (
