@@ -108,10 +108,11 @@ const AddCustomerPage = () => {
       level: formData.level,
       contact: formData.contact,
       location: formData.location,
-      payment: 5.00 // Registration fee
+      payment: 0.01 // Will be updated with actual Paystack payment amount
     };
 
     // Store customer data and show payment modal
+    console.log("Initial customer data:", customerData);
     setPendingCustomerData(customerData);
     setShowPayment(true);
   };
@@ -120,12 +121,16 @@ const AddCustomerPage = () => {
     setShowPayment(false);
     setLoading(true);
 
-    // Add payment reference to customer data
+    // Add payment reference and actual payment amount to customer data
     const customerDataWithPayment = {
       ...pendingCustomerData,
+      payment: 0.01, // Actual amount processed by Paystack (1 pesewa)
       payment_reference: reference.reference,
       payment_status: "paid"
     };
+
+    // Debug: Log what we're sending to the API
+    console.log("Sending customer data to API:", customerDataWithPayment);
 
     try {
       const response = await axios.post(`${API_BASE_URL}/addcustomer`, customerDataWithPayment);
@@ -143,6 +148,11 @@ const AddCustomerPage = () => {
           school: "Kempshot Grammar Academy"
         });
         setPendingCustomerData(null);
+        
+        // Refresh the page to show updated customer data
+        setTimeout(() => {
+          window.location.reload();
+        }, 2000);
       }
     } catch (error) {
       console.error("Error adding customer:", error);
