@@ -108,7 +108,7 @@ const AddCustomerPage = () => {
       level: formData.level,
       contact: formData.contact,
       location: formData.location,
-      payment: 0.01 // Will be updated with actual Paystack payment amount
+      payment: 20.00 // Will be updated with actual Paystack payment amount
     };
 
     // Store customer data and show payment modal
@@ -124,7 +124,7 @@ const AddCustomerPage = () => {
     // Add payment reference and actual payment amount to customer data
     const customerDataWithPayment = {
       ...pendingCustomerData,
-      payment: 0.01, // Actual amount processed by Paystack (1 pesewa)
+      payment: 20.00, // Actual amount processed by Paystack
       payment_reference: reference.reference,
       payment_status: "paid"
     };
@@ -228,7 +228,7 @@ const AddCustomerPage = () => {
         {/* School Selection Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-6 text-center">
-            Add New Customer
+            Pre Admission Form Entry
           </h1>
           
           {/* School Selection */}
@@ -247,7 +247,7 @@ const AddCustomerPage = () => {
                   Kempshot Grammar Academy
                 </h3>
                 <p className="text-sm text-gray-600 dark:text-gray-400">
-                  Secondary Education
+                  Basic Education
                 </p>
               </div>
             </Card>
@@ -266,7 +266,7 @@ const AddCustomerPage = () => {
                   Kempshot Business College
                 </h3>
                 <p className="text-sm text-gray-600 dark:text-gray-400">
-                  Tertiary Education
+                  Secondary Education
                 </p>
               </div>
             </Card>
@@ -374,20 +374,15 @@ const AddCustomerPage = () => {
                   <FaMapMarkerAlt className="inline w-4 h-4 mr-2" />
                   Location
                 </label>
-                <select
+                <input
+                  type="text"
                   name="location"
                   value={formData.location}
                   onChange={handleInputChange}
                   required
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                >
-                  <option value="">Select location</option>
-                  <option value="Accra">Accra</option>
-                  <option value="Kumasi">Kumasi</option>
-                  <option value="Tamale">Tamale</option>
-                  <option value="Cape Coast">Cape Coast</option>
-                  <option value="Takoradi">Takoradi</option>
-                </select>
+                  placeholder="Enter location"
+                />
               </div>
 
             </div>
@@ -399,10 +394,10 @@ const AddCustomerPage = () => {
                 disabled={loading}
                 className="px-8 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium text-lg disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {loading ? "Processing..." : "Proceed to Payment (GHS 0.01)"}
+                {loading ? "Processing..." : "Proceed to Payment (GHS 20.00)"}
               </button>
                 <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
-                  Test Mode: Registration fee of GHS 0.01 (1 pesewa)
+                  Registration fee of GHS 20.00
                 </p>
             </div>
           </form>
@@ -415,7 +410,7 @@ const AddCustomerPage = () => {
           email={formData.email}
           name={formData.name}
           phone={formData.contact}
-          amount={1} // GHS 0.01 (1 pesewa) - FOR TESTING
+          amount={2000} // GHS 20.00 (2000 pesewas)
           onSuccess={handlePaymentSuccess}
           onClose={handlePaymentClose}
         />
