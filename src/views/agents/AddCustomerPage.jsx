@@ -183,10 +183,10 @@ const AddCustomerPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 pb-6">
       {/* Toast Container */}
       <ToastContainer
-        position="top-right"
+        position="top-center"
         autoClose={3000}
         hideProgressBar={false}
         newestOnTop={false}
@@ -196,6 +196,7 @@ const AddCustomerPage = () => {
         draggable
         pauseOnHover
         theme="light"
+        className="!top-4 sm:!top-2"
       />
 
       {/* Loader */}
@@ -205,92 +206,116 @@ const AddCustomerPage = () => {
         </div>
       )}
 
-      {/* Header */}
-      <div className="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            <div className="flex items-center space-x-6">
-              <div className="text-sm">
+      {/* Header - Mobile Optimized */}
+      <div className="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700 sticky top-0 z-40">
+        <div className="max-w-4xl mx-auto px-3 sm:px-4 lg:px-6">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between py-3 sm:py-2 gap-2 sm:gap-0">
+            <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-4">
+              <div className="text-xs sm:text-sm">
                 <span className="text-gray-500 dark:text-gray-400">Agent ID:</span>
-                <span className="ml-2 font-medium text-gray-900 dark:text-white">{agent.agentId || agentId}</span>
+                <span className="ml-1.5 sm:ml-2 font-medium text-gray-900 dark:text-white">{agent.agentId || agentId}</span>
               </div>
-              <div className="text-sm">
-                <span className="text-gray-500 dark:text-gray-400">Agent Name:</span>
-                <span className="ml-2 font-medium text-gray-900 dark:text-white">{agent.agentName}</span>
+              <div className="text-xs sm:text-sm">
+                <span className="text-gray-500 dark:text-gray-400">Agent:</span>
+                <span className="ml-1.5 sm:ml-2 font-medium text-gray-900 dark:text-white truncate">{agent.agentName}</span>
               </div>
             </div>
-            <div className="flex items-center space-x-2 text-sm">
-              <FaQuestionCircle className="text-gray-500 dark:text-gray-400" />
-              <span className="text-gray-500 dark:text-gray-400">Need help?</span>
-              <a href="tel:0543370183" className="font-medium text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300">
-                <FaPhone className="inline w-3 h-3 mr-1" />
-                0543370183
+            <div className="flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm">
+              <FaQuestionCircle className="text-gray-500 dark:text-gray-400 flex-shrink-0" />
+              <span className="text-gray-500 dark:text-gray-400 hidden xs:inline">Need help?</span>
+              <a href="tel:0543370183" className="font-medium text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 flex items-center gap-1">
+                <FaPhone className="w-3 h-3" />
+                <span>0543370183</span>
               </a>
             </div>
           </div>
         </div>
       </div>   
 
-      {/* Main Content */}
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* School Selection Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-6 text-center">
+      {/* Main Content - Mobile Optimized */}
+      <div className="max-w-4xl mx-auto px-3 sm:px-4 lg:px-6 py-4 sm:py-6 lg:py-8">
+        {/* Title */}
+        <div className="mb-4 sm:mb-6">
+          <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 dark:text-white text-center mb-4 sm:mb-6">
             Pre Admission Form Entry
           </h1>
           
-          {/* School Selection */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
-            <Card extra="p-6 cursor-pointer transition-all duration-200 hover:shadow-lg">
-              <div 
-                className={`text-center p-4 rounded-lg border-2 transition-colors ${
+          {/* School Selection - Compact Mobile Design */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3 lg:gap-4">
+            <div 
+              className={`relative p-3 sm:p-4 rounded-xl border-2 transition-all cursor-pointer ${
+                formData.school === "Kempshot Grammar Academy" 
+                  ? "border-blue-500 bg-blue-50 dark:bg-blue-900/20 shadow-md" 
+                  : "border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 hover:border-gray-300 dark:hover:border-gray-600 active:scale-[0.98]"
+              }`}
+              onClick={() => setFormData(prev => ({ ...prev, school: "Kempshot Grammar Academy" }))}
+            >
+              <div className="flex items-center gap-2.5 sm:gap-3">
+                <FaGraduationCap className={`w-6 h-6 sm:w-8 sm:h-8 lg:w-10 lg:h-10 flex-shrink-0 ${
                   formData.school === "Kempshot Grammar Academy" 
-                    ? "border-blue-500 bg-blue-50 dark:bg-blue-900/20" 
-                    : "border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600"
-                }`}
-                onClick={() => setFormData(prev => ({ ...prev, school: "Kempshot Grammar Academy" }))}
-              >
-                <FaGraduationCap className="w-12 h-12 mx-auto mb-3 text-blue-600 dark:text-blue-400" />
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-                  Kempshot Grammar Academy
-                </h3>
-                <p className="text-sm text-gray-600 dark:text-gray-400">
-                  Basic Education
-                </p>
+                    ? "text-blue-600 dark:text-blue-400" 
+                    : "text-gray-400 dark:text-gray-500"
+                }`} />
+                <div className="flex-1 min-w-0">
+                  <h3 className="text-sm sm:text-base lg:text-lg font-semibold text-gray-900 dark:text-white mb-0.5 truncate">
+                    Kempshot Grammar Academy
+                  </h3>
+                  <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">
+                    Basic Education
+                  </p>
+                </div>
+                {formData.school === "Kempshot Grammar Academy" && (
+                  <div className="w-5 h-5 rounded-full bg-blue-600 flex items-center justify-center flex-shrink-0">
+                    <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                    </svg>
+                  </div>
+                )}
               </div>
-            </Card>
+            </div>
 
-            <Card extra="p-6 cursor-pointer transition-all duration-200 hover:shadow-lg">
-              <div 
-                className={`text-center p-4 rounded-lg border-2 transition-colors ${
+            <div 
+              className={`relative p-3 sm:p-4 rounded-xl border-2 transition-all cursor-pointer ${
+                formData.school === "Kempshot Business College" 
+                  ? "border-green-500 bg-green-50 dark:bg-green-900/20 shadow-md" 
+                  : "border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 hover:border-gray-300 dark:hover:border-gray-600 active:scale-[0.98]"
+              }`}
+              onClick={() => setFormData(prev => ({ ...prev, school: "Kempshot Business College" }))}
+            >
+              <div className="flex items-center gap-2.5 sm:gap-3">
+                <FaGraduationCap className={`w-6 h-6 sm:w-8 sm:h-8 lg:w-10 lg:h-10 flex-shrink-0 ${
                   formData.school === "Kempshot Business College" 
-                    ? "border-green-500 bg-green-50 dark:bg-green-900/20" 
-                    : "border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600"
-                }`}
-                onClick={() => setFormData(prev => ({ ...prev, school: "Kempshot Business College" }))}
-              >
-                <FaGraduationCap className="w-12 h-12 mx-auto mb-3 text-green-600 dark:text-green-400" />
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-                  Kempshot Business College
-                </h3>
-                <p className="text-sm text-gray-600 dark:text-gray-400">
-                  Secondary Education
-                </p>
+                    ? "text-green-600 dark:text-green-400" 
+                    : "text-gray-400 dark:text-gray-500"
+                }`} />
+                <div className="flex-1 min-w-0">
+                  <h3 className="text-sm sm:text-base lg:text-lg font-semibold text-gray-900 dark:text-white mb-0.5 truncate">
+                    Kempshot Business College
+                  </h3>
+                  <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">
+                    Secondary Education
+                  </p>
+                </div>
+                {formData.school === "Kempshot Business College" && (
+                  <div className="w-5 h-5 rounded-full bg-green-600 flex items-center justify-center flex-shrink-0">
+                    <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                    </svg>
+                  </div>
+                )}
               </div>
-            </Card>
+            </div>
           </div>
-        </div>            
+        </div>
 
-        
-
-        {/* Customer Form */}
-        <Card extra="p-8">
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* Customer Form - Mobile Optimized */}
+        <Card extra="p-4 sm:p-6 lg:p-8">
+          <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-5 lg:space-y-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-5 lg:gap-6">
               {/* Full Name */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  <FaUser className="inline w-4 h-4 mr-2" />
+              <div className="lg:col-span-1">
+                <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5 sm:mb-2">
+                  <FaUser className="inline w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1.5" />
                   Full Name
                 </label>
                 <input
@@ -299,15 +324,15 @@ const AddCustomerPage = () => {
                   value={formData.name}
                   onChange={handleInputChange}
                   required
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                  placeholder="Enter customer's full name"
+                  className="w-full px-3 sm:px-4 py-2.5 sm:py-3 text-sm sm:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                  placeholder="Enter full name"
                 />
               </div>
 
               {/* Level */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  <FaGraduationCap className="inline w-4 h-4 mr-2" />
+              <div className="lg:col-span-1">
+                <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5 sm:mb-2">
+                  <FaGraduationCap className="inline w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1.5" />
                   Level
                 </label>
                 <select
@@ -315,7 +340,7 @@ const AddCustomerPage = () => {
                   value={formData.level}
                   onChange={handleInputChange}
                   required
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                  className="w-full px-3 sm:px-4 py-2.5 sm:py-3 text-sm sm:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                 >
                   <option value="">Select level</option>
                   {formData.school === "Kempshot Grammar Academy" ? (
@@ -345,9 +370,9 @@ const AddCustomerPage = () => {
               </div>
 
               {/* Email Address */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  <FaUser className="inline w-4 h-4 mr-2" />
+              <div className="lg:col-span-1">
+                <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5 sm:mb-2">
+                  <FaUser className="inline w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1.5" />
                   Email Address
                 </label>
                 <input
@@ -356,15 +381,15 @@ const AddCustomerPage = () => {
                   value={formData.email}
                   onChange={handleInputChange}
                   required
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                  className="w-full px-3 sm:px-4 py-2.5 sm:py-3 text-sm sm:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                   placeholder="customer@example.com"
                 />
               </div>
 
               {/* Phone Number */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  <FaPhone className="inline w-4 h-4 mr-2" />
+              <div className="lg:col-span-1">
+                <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5 sm:mb-2">
+                  <FaPhone className="inline w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1.5" />
                   Phone Number
                 </label>
                 <input
@@ -373,15 +398,15 @@ const AddCustomerPage = () => {
                   value={formData.contact}
                   onChange={handleInputChange}
                   required
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                  className="w-full px-3 sm:px-4 py-2.5 sm:py-3 text-sm sm:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                   placeholder="+233 XX XXX XXXX"
                 />
               </div>
 
               {/* Location */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  <FaMapMarkerAlt className="inline w-4 h-4 mr-2" />
+              <div className="lg:col-span-2">
+                <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5 sm:mb-2">
+                  <FaMapMarkerAlt className="inline w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1.5" />
                   Location
                 </label>
                 <input
@@ -390,35 +415,34 @@ const AddCustomerPage = () => {
                   value={formData.location}
                   onChange={handleInputChange}
                   required
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                  className="w-full px-3 sm:px-4 py-2.5 sm:py-3 text-sm sm:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                   placeholder="Enter location"
                 />
               </div>
-
             </div>
 
-            {/* Submit Button */}
-            <div className="flex flex-col items-center pt-6">
+            {/* Submit Button - Mobile Optimized */}
+            <div className="flex flex-col items-center pt-4 sm:pt-5 lg:pt-6">
               <button
                 type="submit"
                 disabled={loading}
-                className="px-8 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium text-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full sm:w-auto px-6 sm:px-8 py-3 sm:py-3.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 active:bg-blue-800 transition-colors font-medium text-base sm:text-lg disabled:opacity-50 disabled:cursor-not-allowed shadow-md hover:shadow-lg"
               >
                 {loading ? "Processing..." : "Proceed to Payment (GHS 20.00)"}
               </button>
-                <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
-                  Registration fee of GHS 20.00
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
+                Registration fee of GHS 20.00
+              </p>
+              <div className="mt-3 sm:mt-4 pt-3 sm:pt-4 border-t border-gray-200 dark:border-gray-700 text-center w-full">
+                <p className="text-xs text-gray-500 dark:text-gray-400">
+                  <FaQuestionCircle className="inline w-3 h-3 mr-1" />
+                  Need help? Contact us at{" "}
+                  <a href="tel:0543370183" className="font-medium text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300">
+                    <FaPhone className="inline w-3 h-3 mr-1" />
+                    0543370183
+                  </a>
                 </p>
-                <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700 text-center">
-                  <p className="text-xs text-gray-500 dark:text-gray-400">
-                    <FaQuestionCircle className="inline w-3 h-3 mr-1" />
-                    Need help or assistance? Contact us at{" "}
-                    <a href="tel:0543370183" className="font-medium text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300">
-                      <FaPhone className="inline w-3 h-3 mr-1" />
-                      0543370183
-                    </a>
-                  </p>
-                </div>
+              </div>
             </div>
           </form>
         </Card>
@@ -436,26 +460,26 @@ const AddCustomerPage = () => {
         />
       )}
 
-      {/* Success Modal */}
+      {/* Success Modal - Mobile Optimized */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-black bg-opacity-50 backdrop-blur-sm" onClick={handleCloseModal} />
-          <div className="relative bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full mx-4 p-6">
+          <div className="relative bg-white dark:bg-gray-800 rounded-xl shadow-xl max-w-md w-full p-5 sm:p-6">
             <div className="text-center">
-              <div className="w-16 h-16 bg-green-100 dark:bg-green-900/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg className="w-8 h-8 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="w-14 h-14 sm:w-16 sm:h-16 bg-green-100 dark:bg-green-900/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg className="w-7 h-7 sm:w-8 sm:h-8 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                 </svg>
               </div>
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+              <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white mb-2">
                 Customer Added Successfully!
               </h3>
-              <p className="text-gray-600 dark:text-gray-400 mb-6">
+              <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400 mb-6">
                 The customer has been added to {agent.agentName}'s list.
               </p>
               <button
                 onClick={handleCloseModal}
-                className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                className="w-full sm:w-auto px-6 py-2.5 sm:py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 active:bg-blue-800 transition-colors font-medium text-sm sm:text-base"
               >
                 Continue
               </button>

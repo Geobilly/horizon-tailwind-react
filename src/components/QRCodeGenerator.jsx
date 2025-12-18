@@ -7,7 +7,7 @@ const QRCodeGenerator = ({ agentId, agentName, agentLocation }) => {
   const generateAndDownloadQR = async () => {
     try {
       // Generate the URL for adding a customer for this agent
-      const baseUrl = window.location.origin;
+      const baseUrl = "https://edupaygh.vercel.app";
       const addCustomerUrl = `${baseUrl}/empty/agents/${agentId}/add-customer?agentId=${agentId}&agentName=${encodeURIComponent(agentName)}&agentLocation=${encodeURIComponent(agentLocation)}`;
 
       // Create a temporary canvas
