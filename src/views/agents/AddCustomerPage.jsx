@@ -221,7 +221,7 @@ const AddCustomerPage = () => {
             </div>
           </div>
         </div>
-      </div>
+      </div>   
 
       {/* Main Content */}
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -271,7 +271,9 @@ const AddCustomerPage = () => {
               </div>
             </Card>
           </div>
-        </div>
+        </div>            
+
+        
 
         {/* Customer Form */}
         <Card extra="p-8">
