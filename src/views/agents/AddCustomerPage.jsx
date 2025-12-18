@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import Card from "components/card";
-import { FaTimes, FaUser, FaPhone, FaMapMarkerAlt, FaGraduationCap } from "react-icons/fa";
+import { FaTimes, FaUser, FaPhone, FaMapMarkerAlt, FaGraduationCap, FaQuestionCircle } from "react-icons/fa";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
 import CircularWithValueLabel from "components/loader/index";
@@ -219,6 +219,14 @@ const AddCustomerPage = () => {
                 <span className="ml-2 font-medium text-gray-900 dark:text-white">{agent.agentName}</span>
               </div>
             </div>
+            <div className="flex items-center space-x-2 text-sm">
+              <FaQuestionCircle className="text-gray-500 dark:text-gray-400" />
+              <span className="text-gray-500 dark:text-gray-400">Need help?</span>
+              <a href="tel:0543370183" className="font-medium text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300">
+                <FaPhone className="inline w-3 h-3 mr-1" />
+                0543370183
+              </a>
+            </div>
           </div>
         </div>
       </div>   
@@ -401,6 +409,16 @@ const AddCustomerPage = () => {
                 <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
                   Registration fee of GHS 20.00
                 </p>
+                <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700 text-center">
+                  <p className="text-xs text-gray-500 dark:text-gray-400">
+                    <FaQuestionCircle className="inline w-3 h-3 mr-1" />
+                    Need help or assistance? Contact us at{" "}
+                    <a href="tel:0543370183" className="font-medium text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300">
+                      <FaPhone className="inline w-3 h-3 mr-1" />
+                      0543370183
+                    </a>
+                  </p>
+                </div>
             </div>
           </form>
         </Card>
