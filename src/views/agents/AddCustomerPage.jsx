@@ -310,6 +310,13 @@ const AddCustomerPage = () => {
 
         {/* Customer Form - Mobile Optimized */}
         <Card extra="p-4 sm:p-6 lg:p-8">
+          {/* Note */}
+          <div className="mb-4 sm:mb-5 lg:mb-6 p-3 sm:p-4 bg-blue-50 dark:bg-blue-900/20 border-l-4 border-blue-500 rounded-r-lg">
+            <p className="text-sm sm:text-base font-medium text-blue-900 dark:text-blue-200">
+              <span className="font-semibold">Note:</span> Form submission guarantees your admission.
+            </p>
+          </div>
+
           <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-5 lg:space-y-6">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-5 lg:gap-6">
               {/* Full Name */}
