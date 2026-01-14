@@ -624,7 +624,7 @@ const AgentsPage = () => {
         <DataTable
           columns={AgentsColumns()}
           data={agents}
-          title="Agents Summary"
+          title="Agent Summarys"
           searchPlaceholder="Search agents"
           showAddButton={true}
           onAddAgent={handleAddAgent}
