@@ -1,6 +1,4 @@
 import React from "react";
-import { Navigate } from "react-router-dom";
-import { FaFutbol } from "react-icons/fa";
 import { MdAttachMoney } from "react-icons/md";
 import { MdVerifiedUser } from "react-icons/md";
 import { MdPeople } from "react-icons/md";
