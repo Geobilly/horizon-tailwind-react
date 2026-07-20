@@ -5,12 +5,14 @@ import RtlLayout from "layouts/rtl";
 import AdminLayout from "layouts/admin";
 import AuthLayout from "layouts/auth";
 import EmptyLayout from "layouts/empty";
+import PublicLayout from "layouts/public";
 const App = () => {
   return (
     <Routes>
       <Route path="auth/*" element={<AuthLayout />} />
       <Route path="admin/*" element={<AdminLayout />} />
       <Route path="empty/*" element={<EmptyLayout />} />
+      <Route path="public/*" element={<PublicLayout />} />
       <Route path="rtl/*" element={<RtlLayout />} />
       <Route path="/" element={<Navigate to="/admin" replace />} />
     </Routes>

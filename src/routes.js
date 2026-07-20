@@ -174,6 +174,14 @@ const routes = [
     component: <TeacherSignin />,
     hideInSidebar: true,
   },
+  {
+    name: "Face Recognition",
+    layout: "/public",
+    path: "face-recognition",
+    icon: <MdPerson className="h-6 w-6" />,
+    component: null, // handled by PublicLayout
+    hideInSidebar: true,
+  },
   // Teacher Dashboard route - visible to both admin and teacher
   (role === "teacher" || role === "admin") && {
     name: "Teacher Dashboard",

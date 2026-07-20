@@ -125,11 +125,26 @@ module.exports = {
         'slide-out': {
           '0%': { transform: 'translateX(0)', opacity: '1' },
           '100%': { transform: 'translateX(100%)', opacity: '0' },
-        }
+        },
+        'scan': {
+          '0%': { top: '0%' },
+          '100%': { top: '100%' },
+        },
+        'scan-progress': {
+          '0%': { width: '0%' },
+          '100%': { width: '100%' },
+        },
+        'ping-slow': {
+          '0%': { transform: 'scale(1)', opacity: '1' },
+          '100%': { transform: 'scale(1.5)', opacity: '0' },
+        },
       },
       animation: {
         'slide-in': 'slide-in 0.3s ease-out',
-        'slide-out': 'slide-out 0.3s ease-in'
+        'slide-out': 'slide-out 0.3s ease-in',
+        'scan': 'scan 2s ease-in-out infinite',
+        'scan-progress': 'scan-progress 2s ease-in-out',
+        'ping-slow': 'ping-slow 2s cubic-bezier(0, 0, 0.2, 1) infinite',
       }
     },
     screens: {
